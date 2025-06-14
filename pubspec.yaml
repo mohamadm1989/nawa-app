@@ -92,6 +92,11 @@ dependencies:
   timeago: ^3.4.0
   flutter_launcher_icons: ^0.13.1
 
+  # Local Notifications
+  flutter_local_notifications: ^17.2.2
+  permission_handler: ^11.3.1
+  timezone: ^0.9.4
+
   # Icons
   cupertino_icons: ^1.0.8
 

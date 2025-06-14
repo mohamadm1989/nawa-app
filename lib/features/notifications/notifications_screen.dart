@@ -3,6 +3,8 @@ import '../../core/constants/constants.dart';
 import '../../core/utils/responsive_helper.dart';
 import '../../core/animations/nawa_animations.dart';
 import '../../core/routes/app_routes.dart';
+import '../../core/services/notification_service.dart';
+import '../../core/services/permissions_service.dart';
 import '../../shared/models/models.dart';
 
 /// صفحة الإشعارات
@@ -157,6 +159,26 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _checkNotificationPermissions();
+  }
+
+  /// التحقق من أذونات الإشعارات
+  Future<void> _checkNotificationPermissions() async {
+    final isGranted = await PermissionsService.instance.isNotificationPermissionGranted();
+    if (!isGranted && mounted) {
+      _showPermissionDialog();
+    }
+  }
+
+  /// عرض حوار طلب أذونات الإشعارات
+  void _showPermissionDialog() {
+    PermissionsService.instance.showPermissionDialog(
+      context,
+      title: 'إذن الإشعارات مطلوب',
+      message: 'للحصول على إشعارات فورية حول التبرعات والمشاريع، يرجى منح إذن الإشعارات.',
+      permissionName: 'الإشعارات',
+      requestPermission: () => PermissionsService.instance.requestNotificationPermission(),
+    );
   }
 
   @override
@@ -228,6 +250,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           tooltip: 'تحديد الكل كمقروء',
         ),
         
+        // زر اختبار الإشعارات
+        IconButton(
+          onPressed: _testNotification,
+          icon: const Icon(Icons.notification_add),
+          tooltip: 'اختبار إشعار',
+        ),
+
         // زر الإعدادات
         IconButton(
           onPressed: _showNotificationSettings,
@@ -390,17 +419,39 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         controller: _tabController,
         indicator: BoxDecoration(
           color: AppColors.primaryGreen,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
         ),
+        indicatorPadding: const EdgeInsets.all(4),
         labelColor: AppColors.textOnColor,
         unselectedLabelColor: AppColors.textSecondary,
         labelStyle: AppTextStyles.labelMedium.copyWith(
           fontWeight: FontWeight.w600,
         ),
+        unselectedLabelStyle: AppTextStyles.labelMedium.copyWith(
+          fontWeight: FontWeight.w500,
+        ),
+        labelPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
         tabs: const [
-          Tab(text: 'الكل'),
-          Tab(text: 'غير مقروء'),
-          Tab(text: 'مهم'),
+          Tab(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text('الكل'),
+            ),
+          ),
+          Tab(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text('غير مقروء'),
+            ),
+          ),
+          Tab(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Text('مهم'),
+            ),
+          ),
         ],
       ),
     );
@@ -836,6 +887,25 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تم تحديد جميع الإشعارات كمقروءة')),
     );
+  }
+
+  /// اختبار إشعار محلي
+  Future<void> _testNotification() async {
+    final success = await NotificationService.instance.showLocalNotification(
+      title: 'إشعار تجريبي 🔔',
+      body: 'هذا إشعار تجريبي من تطبيق نوى للتأكد من عمل الإشعارات بشكل صحيح',
+      type: NotificationType.general,
+      data: {
+        'action': 'test',
+        'timestamp': DateTime.now().toIso8601String(),
+      },
+    );
+
+    if (success) {
+      _showInfoMessage('تم إرسال إشعار تجريبي بنجاح! 🎉');
+    } else {
+      _showInfoMessage('فشل في إرسال الإشعار. تحقق من الأذونات.');
+    }
   }
 
   void _showNotificationSettings() {

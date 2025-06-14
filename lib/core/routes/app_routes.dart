@@ -13,6 +13,7 @@ import '../../features/notifications/notifications_screen.dart';
 import '../../features/map/map_screen.dart';
 import '../../features/favorites/favorites_screen.dart';
 import '../../features/settings/settings_screen.dart';
+import '../../features/settings/permissions_settings_screen.dart';
 import '../../features/support/support_screen.dart';
 import '../../features/faq/faq_screen.dart';
 import '../../features/terms/terms_screen.dart';
@@ -50,6 +51,7 @@ class AppRoutes {
   static const String favorites = '/favorites';
   static const String notifications = '/notifications';
   static const String settings = '/settings';
+  static const String permissionsSettings = '/permissions-settings';
   static const String support = '/support';
   static const String faq = '/faq';
   static const String terms = '/terms';
@@ -159,6 +161,11 @@ class AppRoutes {
       case AppRoutes.settings:
         return MaterialPageRoute(
           builder: (context) => const SettingsScreen(),
+        );
+
+      case AppRoutes.permissionsSettings:
+        return MaterialPageRoute(
+          builder: (context) => const PermissionsSettingsScreen(),
         );
 
       case AppRoutes.support:

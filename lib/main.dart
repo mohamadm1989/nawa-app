@@ -6,6 +6,8 @@ import 'core/theme/app_theme.dart';
 import 'core/constants/constants.dart';
 import 'core/routes/app_routes.dart';
 import 'core/storage/local_storage_manager.dart';
+import 'core/services/notification_service.dart';
+import 'core/services/permissions_service.dart';
 // import 'core/network/connectivity_manager.dart';
 // import 'core/sync/sync_manager.dart';
 // import 'shared/widgets/connectivity_indicator.dart';
@@ -44,6 +46,9 @@ void main() async {
 
     // تهيئة التخزين المحلي
     await LocalStorageManager.init();
+
+    // تهيئة خدمة الإشعارات
+    await NotificationService.instance.initialize();
 
     // تهيئة مدير الاتصال (معطل مؤقتاً)
     // await ConnectivityManager.instance.initialize();

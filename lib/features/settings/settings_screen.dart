@@ -166,6 +166,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: _smsNotifications,
             onChanged: (value) => setState(() => _smsNotifications = value),
           ),
+          _buildDivider(),
+          _buildNavigationTile(
+            icon: Icons.security,
+            title: 'أذونات التطبيق',
+            subtitle: 'إدارة أذونات الإشعارات والموقع والكاميرا',
+            onTap: () => Navigator.pushNamed(context, '/permissions-settings'),
+          ),
         ],
       ),
     );
@@ -457,6 +464,47 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _checkForUpdates() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('أنت تستخدم أحدث إصدار من التطبيق')),
+    );
+  }
+
+  Widget _buildNavigationTile({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(
+          icon,
+          color: AppColors.primaryGreen,
+          size: 24,
+        ),
+      ),
+      title: Text(
+        title,
+        style: AppTextStyles.labelLarge.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: AppTextStyles.bodySmall.copyWith(
+          color: AppColors.textSecondary,
+        ),
+      ),
+      trailing: const Icon(
+        Icons.arrow_forward_ios,
+        color: AppColors.helperGray,
+        size: 16,
+      ),
+      onTap: onTap,
     );
   }
 }
