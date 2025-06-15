@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/constants/constants.dart';
 // import '../../core/services/auth_service.dart';
 import '../../core/routes/app_routes.dart';
@@ -8,6 +9,7 @@ import '../../core/utils/mobile_responsive.dart';
 import '../../core/animations/nawa_animations.dart';
 import '../../shared/widgets/widgets.dart';
 import '../../shared/models/project_model.dart';
+import 'bloc/bloc.dart';
 // import '../../shared/models/user_model.dart';
 
 /// الصفحة الرئيسية

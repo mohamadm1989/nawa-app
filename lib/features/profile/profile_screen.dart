@@ -467,7 +467,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               end: Alignment.bottomCenter,
               colors: [
                 AppColors.primaryGreen,
-                AppColors.primaryGreen.withOpacity(0.8),
+                AppColors.primaryGreen.withValues(alpha: 0.8),
               ],
             ),
           ),
@@ -504,7 +504,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                           border: Border.all(color: Colors.white, width: 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
+                              color: Colors.black.withValues(alpha: 0.2),
                               blurRadius: 10,
                               offset: const Offset(0, 5),
                             ),
@@ -512,7 +512,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ),
                         child: CircleAvatar(
                           radius: 48,
-                          backgroundColor: AppColors.primaryGreen.withOpacity(0.8),
+                          backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.8),
                           child: const Icon(
                             Icons.person,
                             size: 50,
@@ -562,9 +562,9 @@ class _ProfileScreenState extends State<ProfileScreen>
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.3)),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,

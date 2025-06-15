@@ -32,7 +32,8 @@ dependencies:
     sdk: flutter
 
   # State Management
-  flutter_bloc: ^8.1.3
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
   provider: ^6.0.5
 
   # Firebase & Authentication (معطل مؤقتاً للويب)
@@ -104,6 +105,12 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+
+  # Testing packages
+  bloc_test: ^9.1.7
+  mocktail: ^1.0.4
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to

@@ -7,7 +7,7 @@ class FeatureFlags {
   // ========== إدارة الحالة ==========
   
   /// استخدام BLoC بدلاً من setState
-  static const bool useNewStateManagement = false;
+  static const bool useNewStateManagement = true; // تفعيل BLoC تدريجياً
   
   /// استخدام Provider للبيانات المشتركة
   static const bool useProviderPattern = false;
