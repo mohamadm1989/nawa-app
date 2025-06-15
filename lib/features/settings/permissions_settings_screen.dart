@@ -138,7 +138,7 @@ class _PermissionsSettingsScreenState extends State<PermissionsSettingsScreen> {
       children: [
         Text(
           'الأذونات المطلوبة',
-          style: AppTextStyles.titleMedium.copyWith(
+          style: AppTextStyles.labelLarge.copyWith(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
           ),
@@ -213,7 +213,7 @@ class _PermissionsSettingsScreenState extends State<PermissionsSettingsScreen> {
         ),
         title: Text(
           title,
-          style: AppTextStyles.titleSmall.copyWith(
+          style: AppTextStyles.labelLarge.copyWith(
             color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
           ),
@@ -289,7 +289,7 @@ class _PermissionsSettingsScreenState extends State<PermissionsSettingsScreen> {
             Expanded(
               child: Text(
                 'جميع الأذونات مُفعلة! 🎉',
-                style: AppTextStyles.titleSmall.copyWith(
+                style: AppTextStyles.labelLarge.copyWith(
                   color: AppColors.success,
                   fontWeight: FontWeight.bold,
                 ),

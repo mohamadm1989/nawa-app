@@ -7,63 +7,101 @@ import 'core/constants/constants.dart';
 import 'core/routes/app_routes.dart';
 import 'core/storage/local_storage_manager.dart';
 import 'core/services/notification_service.dart';
-import 'core/services/permissions_service.dart';
 // import 'core/network/connectivity_manager.dart';
 // import 'core/sync/sync_manager.dart';
 // import 'shared/widgets/connectivity_indicator.dart';
 // import 'core/services/firebase_service.dart';
 
 void main() async {
-  // إعداد معالج الأخطاء الشامل - إخفاء الأخطاء البصرية في الواجهة
+  // إعداد معالج الأخطاء الآمن
+  _setupSafeErrorHandling();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // طباعة معلومات النظام للتشخيص
+  PlatformSafe.printPlatformInfo();
+  FeatureFlags.printStatus();
+
+  try {
+    await _initializeAppSafely();
+    runApp(const NawaApp());
+  } catch (e, stackTrace) {
+    SafetyMonitor.logError('App Initialization', e, stackTrace);
+    runApp(const ErrorApp());
+  }
+}
+
+/// إعداد معالج الأخطاء الآمن
+void _setupSafeErrorHandling() {
   FlutterError.onError = (FlutterErrorDetails details) {
     // إخفاء رسائل overflow تمامًا
     if (details.exception.toString().contains('RenderFlex overflowed') ||
         details.exception.toString().contains('overflow')) {
-      // لا تطبع رسائل overflow نهائيًا
       return;
     }
 
-    // إخفاء الأخطاء البصرية في الواجهة (للإنتاج)
-    // FlutterError.presentError(details); // معطل لإخفاء رسائل الخطأ البصرية
-
-    // طباعة الأخطاء الأخرى في الكونسول فقط (للتطوير)
-    debugPrint('🚨 Flutter Error: ${details.exception}');
-    debugPrint('📍 Stack: ${details.stack}');
+    // تسجيل الخطأ في نظام المراقبة
+    SafetyMonitor.logError(
+      'Flutter Error',
+      details.exception,
+      details.stack,
+    );
   };
 
   // معالج الأخطاء غير المتوقعة
   PlatformDispatcher.instance.onError = (error, stack) {
-    debugPrint('🚨 Platform Error: $error');
-    debugPrint('📍 Stack: $stack');
+    SafetyMonitor.logError('Platform Error', error, stack);
     return true;
   };
+}
 
-  WidgetsFlutterBinding.ensureInitialized();
-
+/// تهيئة التطبيق بأمان
+Future<void> _initializeAppSafely() async {
   try {
+    SafetyMonitor.logInfo('App Init', 'بدء تهيئة التطبيق');
+
     // تطبيق إعدادات شريط الحالة
     SystemChrome.setSystemUIOverlayStyle(AppTheme.systemUiOverlayStyle);
+    SafetyMonitor.logSuccess('System UI Setup');
 
     // تهيئة التخزين المحلي
     await LocalStorageManager.init();
+    SafetyMonitor.logSuccess('Local Storage Init');
 
-    // تهيئة خدمة الإشعارات
-    await NotificationService.instance.initialize();
+    // تهيئة خدمة الإشعارات (مع حماية المنصة)
+    if (PlatformSafe.supportsLocalNotifications) {
+      await NotificationService.instance.initialize();
+      SafetyMonitor.logSuccess('Notification Service Init');
+    } else {
+      SafetyMonitor.logInfo('Notification Service', 'غير مدعوم على هذه المنصة');
+    }
+
+    // تهيئة Firebase (إذا كان مفعل)
+    if (FeatureFlags.useFirebase) {
+      // await FirebaseService.instance.initialize();
+      SafetyMonitor.logInfo('Firebase', 'سيتم تفعيله لاحقاً');
+    }
 
     // تهيئة مدير الاتصال (معطل مؤقتاً)
-    // await ConnectivityManager.instance.initialize();
+    // if (FeatureFlags.useAdvancedOfflineMode) {
+    //   await ConnectivityManager.instance.initialize();
+    // }
 
     // تهيئة مدير المزامنة (معطل مؤقتاً)
-    // await SyncManager.instance.initialize();
+    // if (FeatureFlags.useAdvancedOfflineMode) {
+    //   await SyncManager.instance.initialize();
+    // }
 
-    // تهيئة Firebase (معطل مؤقتاً للويب)
-    // await FirebaseService.instance.initialize();
+    // فحص صحة التطبيق بعد التهيئة
+    final isHealthy = SafetyMonitor.checkAppHealth();
+    if (!isHealthy) {
+      SafetyMonitor.logWarning('App Init', 'التطبيق غير صحي بعد التهيئة');
+    }
 
-    runApp(const NawaApp());
+    SafetyMonitor.logSuccess('App Initialization Complete');
   } catch (e, stackTrace) {
-    debugPrint('🚨 خطأ في تهيئة التطبيق: $e');
-    debugPrint('📍 Stack: $stackTrace');
-    runApp(const ErrorApp());
+    SafetyMonitor.logError('App Initialization', e, stackTrace);
+    rethrow;
   }
 }
 
@@ -134,8 +172,14 @@ class NawaApp extends StatelessWidget {
       // ========== التوجيه ==========
       initialRoute: AppRoutes.welcome,
 
-      // إعداد اتجاه النص للعربية
+      // إعداد اتجاه النص للعربية مع معالجة الأخطاء
       builder: (context, child) {
+        // إخفاء رسائل overflow البصرية تماماً
+        ErrorWidget.builder = (FlutterErrorDetails errorDetails) {
+          SafetyMonitor.logError('Widget Error', errorDetails.exception);
+          return Container(); // عرض فارغ بدلاً من رسالة الخطأ
+        };
+
         return Directionality(
           textDirection: TextDirection.rtl,
           child: child!,
