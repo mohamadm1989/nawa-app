@@ -11,6 +11,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import '../storage/local_storage_manager.dart';
 import '../../shared/models/notification_model.dart';
 import '../constants/app_constants.dart';
+import 'permissions_service.dart';
 
 /// خدمة إدارة الإشعارات المحلية والخارجية
 class NotificationService {
@@ -497,7 +498,15 @@ class NotificationService {
 
   /// فتح إعدادات الإشعارات في النظام
   Future<void> openNotificationSettings() async {
-    await openAppSettings();
+    try {
+      if (kIsWeb) {
+        debugPrint('🌐 فتح إعدادات الإشعارات غير مدعوم على الويب');
+        return;
+      }
+      await PermissionsService.instance.openAppSettings();
+    } catch (e) {
+      debugPrint('❌ خطأ في فتح إعدادات الإشعارات: $e');
+    }
   }
 
   /// تنظيف الموارد

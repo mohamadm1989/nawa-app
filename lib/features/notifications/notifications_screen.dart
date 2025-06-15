@@ -921,26 +921,37 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   /// اختبار إشعار محلي
   Future<void> _testNotification() async {
-    if (kIsWeb) {
-      // للويب، نستخدم الحل المخصص
-      await WebNotificationService.instance.sendTestNotification();
-      _showInfoMessage('تم إرسال إشعار تجريبي للويب! 🌐');
-    } else {
-      // للموبايل، نستخدم الطريقة العادية
-      final success = await NotificationService.instance.showLocalNotification(
-        title: 'إشعار تجريبي 🔔',
-        body: 'هذا إشعار تجريبي من تطبيق نوى للتأكد من عمل الإشعارات بشكل صحيح',
-        type: NotificationType.general,
-        data: {
-          'action': 'test',
-          'timestamp': DateTime.now().toIso8601String(),
-        },
-      );
-
-      if (success) {
-        _showInfoMessage('تم إرسال إشعار تجريبي بنجاح! 🎉');
+    try {
+      if (kIsWeb) {
+        // للويب، نستخدم الحل المخصص
+        await WebNotificationService.instance.sendTestNotification();
+        if (mounted) {
+          _showInfoMessage('تم إرسال إشعار تجريبي للويب! 🌐');
+        }
       } else {
-        _showInfoMessage('فشل في إرسال الإشعار. تحقق من الأذونات.');
+        // للموبايل، نستخدم الطريقة العادية
+        final success = await NotificationService.instance.showLocalNotification(
+          title: 'إشعار تجريبي 🔔',
+          body: 'هذا إشعار تجريبي من تطبيق نوى للتأكد من عمل الإشعارات بشكل صحيح',
+          type: NotificationType.general,
+          data: {
+            'action': 'test',
+            'timestamp': DateTime.now().toIso8601String(),
+          },
+        );
+
+        if (mounted) {
+          if (success) {
+            _showInfoMessage('تم إرسال إشعار تجريبي بنجاح! 🎉');
+          } else {
+            _showInfoMessage('فشل في إرسال الإشعار. تحقق من الأذونات.');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('❌ خطأ في اختبار الإشعار: $e');
+      if (mounted) {
+        _showErrorMessage('حدث خطأ في اختبار الإشعار');
       }
     }
   }
@@ -1388,6 +1399,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   void _showErrorMessage(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -1420,6 +1432,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   void _showInfoMessage(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -1450,4 +1463,6 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       ),
     );
   }
+
+
 }
