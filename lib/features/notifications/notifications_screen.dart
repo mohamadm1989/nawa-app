@@ -219,30 +219,51 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     return SafeWidget(
       widgetName: 'NotificationsScreen',
       child: Scaffold(
-      backgroundColor: AppColors.backgroundPrimary,
-      appBar: _buildAppBar(),
-      body: Column(
-        children: [
-          // الإحصائيات السريعة
-          _buildQuickStats(),
-          
-          // التبويبات
-          _buildTabBar(),
-          
-          // محتوى التبويبات
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildAllNotifications(),
-                _buildUnreadNotifications(),
-                _buildImportantNotifications(),
-              ],
-            ),
+        backgroundColor: AppColors.backgroundPrimary,
+        appBar: _buildAppBar(),
+        body: SafeWidget(
+          widgetName: 'NotificationsBody',
+          child: Column(
+            children: [
+              // الإحصائيات السريعة
+              SafeWidget(
+                widgetName: 'QuickStats',
+                child: _buildQuickStats(),
+              ),
+
+              // التبويبات
+              SafeWidget(
+                widgetName: 'TabBar',
+                child: _buildTabBar(),
+              ),
+
+              // محتوى التبويبات
+              Expanded(
+                child: SafeWidget(
+                  widgetName: 'TabBarView',
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      SafeWidget(
+                        widgetName: 'AllNotifications',
+                        child: _buildAllNotifications(),
+                      ),
+                      SafeWidget(
+                        widgetName: 'UnreadNotifications',
+                        child: _buildUnreadNotifications(),
+                      ),
+                      SafeWidget(
+                        widgetName: 'ImportantNotifications',
+                        child: _buildImportantNotifications(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
-    ),
     );
   }
 
@@ -525,28 +546,40 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   Widget _buildNotificationsList(List<Map<String, dynamic>> notifications) {
     if (notifications.isEmpty) {
-      return _buildEmptyState(
-        icon: Icons.notifications_none,
-        title: 'لا توجد إشعارات',
-        message: 'ستظهر الإشعارات الجديدة هنا',
+      return SafeWidget(
+        widgetName: 'EmptyNotifications',
+        child: _buildEmptyState(
+          icon: Icons.notifications_none,
+          title: 'لا توجد إشعارات',
+          message: 'ستظهر الإشعارات الجديدة هنا',
+        ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: notifications.length,
-      itemBuilder: (context, index) {
-        final notification = notifications[index];
-        return AnimatedContainer(
-          duration: Duration(milliseconds: 300 + (index * 50)),
-          curve: Curves.easeOutBack,
-          transform: Matrix4.translationValues(0, 0, 0),
-          child: InteractiveAnimation(
-            onTap: () => _handleNotificationTap(notification),
-            child: _buildNotificationCard(notification),
-          ),
-        );
-      },
+    return SafeWidget(
+      widgetName: 'NotificationsList',
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: notifications.length,
+        itemBuilder: (context, index) {
+          final notification = notifications[index];
+          return SafeWidget(
+            widgetName: 'NotificationItem_$index',
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 300 + (index * 50)),
+              curve: Curves.easeOutBack,
+              transform: Matrix4.translationValues(0, 0, 0),
+              child: InteractiveAnimation(
+                onTap: () => _handleNotificationTap(notification),
+                child: SafeWidget(
+                  widgetName: 'NotificationCard_$index',
+                  child: _buildNotificationCard(notification),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -784,8 +817,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   void _handleNotificationTap(Map<String, dynamic> notification) {
     // تحديد الإشعار كمقروء عند النقر
     if (!notification['isRead']) {
-      setState(() {
-        notification['isRead'] = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {
+            notification['isRead'] = true;
+          });
+        }
       });
     }
 
@@ -884,39 +921,51 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   void _toggleReadStatus(Map<String, dynamic> notification) {
-    setState(() {
-      notification['isRead'] = !notification['isRead'];
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          notification['isRead'] = !notification['isRead'];
+        });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          notification['isRead'] ? 'تم تحديد الإشعار كمقروء' : 'تم تحديد الإشعار كغير مقروء',
-        ),
-      ),
-    );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              notification['isRead'] ? 'تم تحديد الإشعار كمقروء' : 'تم تحديد الإشعار كغير مقروء',
+            ),
+          ),
+        );
+      }
+    });
   }
 
   void _deleteNotification(Map<String, dynamic> notification) {
-    setState(() {
-      _allNotifications.removeWhere((n) => n['id'] == notification['id']);
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _allNotifications.removeWhere((n) => n['id'] == notification['id']);
+        });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم حذف الإشعار')),
-    );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم حذف الإشعار')),
+        );
+      }
+    });
   }
 
   void _markAllAsRead() {
-    setState(() {
-      for (var notification in _allNotifications) {
-        notification['isRead'] = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          for (var notification in _allNotifications) {
+            notification['isRead'] = true;
+          }
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('تم تحديد جميع الإشعارات كمقروءة')),
+        );
       }
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('تم تحديد جميع الإشعارات كمقروءة')),
-    );
   }
 
   /// اختبار إشعار محلي

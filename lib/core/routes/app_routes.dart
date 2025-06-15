@@ -9,7 +9,7 @@ import '../../features/home/home_screen.dart';
 import '../../features/project_details/project_details_screen.dart';
 import '../../features/donate/simple_donate_screen.dart';
 import '../../features/profile/profile_screen.dart';
-import '../../features/notifications/notifications_screen.dart';
+import '../../features/notifications/simple_notifications_screen.dart';
 import '../../features/map/map_screen.dart';
 import '../../features/favorites/favorites_screen.dart';
 import '../../features/settings/settings_screen.dart';
@@ -155,7 +155,7 @@ class AppRoutes {
 
       case AppRoutes.notifications:
         return MaterialPageRoute(
-          builder: (context) => const NotificationsScreen(),
+          builder: (context) => const SimpleNotificationsScreen(),
         );
 
       case AppRoutes.settings:

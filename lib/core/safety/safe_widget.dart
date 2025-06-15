@@ -67,9 +67,14 @@ class _SafeWidgetWrapperState extends State<_SafeWidgetWrapper> {
   }
 
   void _handleError(dynamic error, StackTrace stackTrace) {
-    setState(() {
-      _hasError = true;
-      _errorMessage = error.toString();
+    // تأخير setState لتجنب مشاكل البناء
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setState(() {
+          _hasError = true;
+          _errorMessage = error.toString();
+        });
+      }
     });
 
     SafetyMonitor.logError(widget.widgetName, error, stackTrace);
