@@ -20,17 +20,8 @@ class _ProfileScreenState extends State<ProfileScreen>
   late TabController _tabController;
   bool _isLoading = false;
 
-  // بيانات المستخدم التجريبية
-  final Map<String, dynamic> _userProfile = {
-    'name': 'أحمد محمد الحلبي',
-    'email': 'ahmed.halabi@example.com',
-    'phone': '+963912345678',
-    'location': 'حلب، سوريا',
-    'joinDate': '15 يناير 2024',
-    'avatar': null,
-    'bio': 'مهندس مدني، أحب أساعد في إعادة إعمار سوريا الحبيبة 🇸🇾',
-    'verified': true,
-  };
+  // بيانات المستخدم الآمنة
+  Map<String, dynamic> get _userProfile => UserDataManager.getSafeUserData();
 
   final Map<String, dynamic> _userStats = {
     'totalDonations': 1250.0,
@@ -113,7 +104,9 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeWidget(
+      widgetName: 'ProfileScreen',
+      child: Scaffold(
       backgroundColor: AppColors.backgroundPrimary,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
@@ -222,6 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
       // ========== البار السفلي الموحد ==========
       bottomNavigationBar: _buildBottomNavigation(),
+    ),
     );
   }
 

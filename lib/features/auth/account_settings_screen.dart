@@ -13,9 +13,22 @@ class AccountSettingsScreen extends StatefulWidget {
 }
 
 class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
-  final _nameController = TextEditingController(text: 'أحمد محمد');
-  final _emailController = TextEditingController(text: 'ahmed@example.com');
-  final _phoneController = TextEditingController(text: '+963 XXX XXX XXX');
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  late final TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeControllers();
+  }
+
+  void _initializeControllers() {
+    final userData = UserDataManager.getSafeUserData();
+    _nameController = TextEditingController(text: userData['name'] ?? 'مستخدم');
+    _emailController = TextEditingController(text: userData['email'] ?? 'غير محدد');
+    _phoneController = TextEditingController(text: userData['phone'] ?? 'غير محدد');
+  }
   
   bool _isLoading = false;
   bool _emailNotifications = true;

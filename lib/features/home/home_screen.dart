@@ -484,14 +484,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // تحميل بيانات المستخدم (محاكاة)
-      _currentUser = {
-        'uid': 'demo_user',
-        'name': 'أحمد محمد',
-        'phone': '+963912345678',
-        'email': 'ahmed@example.com',
-        'avatar': null,
-      };
+      // تحميل بيانات المستخدم الآمنة
+      _currentUser = UserDataManager.getSafeUserData();
       
       // تحميل المشاريع (بيانات تجريبية)
       await Future.delayed(const Duration(seconds: 1)); // محاكاة التحميل

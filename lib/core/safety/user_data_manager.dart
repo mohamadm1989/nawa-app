@@ -30,14 +30,16 @@ class UserDataManager {
   static Map<String, dynamic> _getOriginalUserData() {
     // هذه البيانات ستأتي من Firebase لاحقاً
     return {
-      'uid': 'demo_user_${DateTime.now().millisecondsSinceEpoch}',
-      'name': 'أحمد محمد',
+      'uid': 'user_${DateTime.now().millisecondsSinceEpoch}',
+      'name': 'أحمد محمد الحلبي',
       'phone': FeatureFlags.useSecureData ? null : '+963912345678',
-      'email': FeatureFlags.useSecureData ? null : 'ahmed@example.com',
+      'email': FeatureFlags.useSecureData ? null : 'ahmed.halabi@example.com',
       'avatar': null,
-      'location': FeatureFlags.useSecureData ? null : 'دمشق، سوريا',
-      'joinDate': DateTime.now().subtract(const Duration(days: 30)).toIso8601String(),
-      'isVerified': false,
+      'location': FeatureFlags.useSecureData ? null : 'حلب، سوريا',
+      'joinDate': '15 يناير 2024',
+      'bio': 'مهندس مدني، أحب أساعد في إعادة إعمار سوريا الحبيبة 🇸🇾',
+      'verified': true,
+      'isVerified': true,
       'role': 'user',
     };
   }

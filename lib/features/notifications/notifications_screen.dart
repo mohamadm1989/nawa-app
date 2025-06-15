@@ -189,7 +189,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return SafeWidget(
+      widgetName: 'NotificationsScreen',
+      child: Scaffold(
       backgroundColor: AppColors.backgroundPrimary,
       appBar: _buildAppBar(),
       body: Column(
@@ -213,6 +215,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           ),
         ],
       ),
+    ),
     );
   }
 

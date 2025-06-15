@@ -32,7 +32,7 @@ class FeatureFlags {
   // ========== الأمان والحماية ==========
   
   /// استخدام البيانات الآمنة (إزالة البيانات الحساسة)
-  static const bool useSecureData = false;
+  static const bool useSecureData = true; // تفعيل الأمان
   
   /// تفعيل تشفير البيانات المحلية
   static const bool useEncryptedStorage = false;
@@ -43,10 +43,10 @@ class FeatureFlags {
   // ========== معالجة الأخطاء ==========
   
   /// نظام معالجة الأخطاء الجديد
-  static const bool useNewErrorHandling = false;
+  static const bool useNewErrorHandling = true; // تفعيل معالجة الأخطاء
   
   /// تفعيل مراقبة الأداء
-  static const bool usePerformanceMonitoring = false;
+  static const bool usePerformanceMonitoring = true; // تفعيل مراقبة الأداء
   
   /// تفعيل تقارير الأخطاء
   static const bool useCrashReporting = false;
@@ -54,7 +54,7 @@ class FeatureFlags {
   // ========== تحسينات الأداء ==========
   
   /// استخدام Pagination للبيانات
-  static const bool usePagination = false;
+  static const bool usePagination = true; // تفعيل التحميل التدريجي
   
   /// تفعيل الذاكرة التخزينية المحسنة
   static const bool useAdvancedCaching = false;
