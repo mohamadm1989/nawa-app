@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' as permission_handler;
 
 /// خدمة إدارة أذونات النظام
 class PermissionsService {
@@ -17,11 +17,11 @@ class PermissionsService {
       debugPrint('📱 طلب إذن الإشعارات...');
 
       if (Platform.isAndroid) {
-        final status = await Permission.notification.request();
+        final status = await permission_handler.Permission.notification.request();
         return _mapPermissionStatus(status, 'الإشعارات');
       } else if (Platform.isIOS) {
         // في iOS، الإذن يُطلب من خلال flutter_local_notifications
-        final status = await Permission.notification.request();
+        final status = await permission_handler.Permission.notification.request();
         return _mapPermissionStatus(status, 'الإشعارات');
       }
 
@@ -43,7 +43,7 @@ class PermissionsService {
     try {
       debugPrint('📍 طلب إذن الموقع...');
 
-      final status = await Permission.location.request();
+      final status = await permission_handler.Permission.location.request();
       return _mapPermissionStatus(status, 'الموقع');
     } catch (e) {
       debugPrint('❌ خطأ في طلب إذن الموقع: $e');
@@ -59,7 +59,7 @@ class PermissionsService {
     try {
       debugPrint('📷 طلب إذن الكاميرا...');
 
-      final status = await Permission.camera.request();
+      final status = await permission_handler.Permission.camera.request();
       return _mapPermissionStatus(status, 'الكاميرا');
     } catch (e) {
       debugPrint('❌ خطأ في طلب إذن الكاميرا: $e');
@@ -75,7 +75,7 @@ class PermissionsService {
     try {
       debugPrint('🖼️ طلب إذن معرض الصور...');
 
-      final status = await Permission.photos.request();
+      final status = await permission_handler.Permission.photos.request();
       return _mapPermissionStatus(status, 'معرض الصور');
     } catch (e) {
       debugPrint('❌ خطأ في طلب إذن معرض الصور: $e');
@@ -91,7 +91,7 @@ class PermissionsService {
     try {
       debugPrint('💾 طلب إذن التخزين...');
 
-      final status = await Permission.storage.request();
+      final status = await permission_handler.Permission.storage.request();
       return _mapPermissionStatus(status, 'التخزين');
     } catch (e) {
       debugPrint('❌ خطأ في طلب إذن التخزين: $e');
@@ -107,7 +107,7 @@ class PermissionsService {
     try {
       debugPrint('🎤 طلب إذن الميكروفون...');
 
-      final status = await Permission.microphone.request();
+      final status = await permission_handler.Permission.microphone.request();
       return _mapPermissionStatus(status, 'الميكروفون');
     } catch (e) {
       debugPrint('❌ خطأ في طلب إذن الميكروفون: $e');
@@ -121,7 +121,7 @@ class PermissionsService {
   /// التحقق من حالة إذن الإشعارات
   Future<bool> isNotificationPermissionGranted() async {
     try {
-      final status = await Permission.notification.status;
+      final status = await permission_handler.Permission.notification.status;
       return status.isGranted;
     } catch (e) {
       debugPrint('❌ خطأ في التحقق من إذن الإشعارات: $e');
@@ -132,7 +132,7 @@ class PermissionsService {
   /// التحقق من حالة إذن الموقع
   Future<bool> isLocationPermissionGranted() async {
     try {
-      final status = await Permission.location.status;
+      final status = await permission_handler.Permission.location.status;
       return status.isGranted;
     } catch (e) {
       debugPrint('❌ خطأ في التحقق من إذن الموقع: $e');
@@ -143,7 +143,7 @@ class PermissionsService {
   /// التحقق من حالة إذن الكاميرا
   Future<bool> isCameraPermissionGranted() async {
     try {
-      final status = await Permission.camera.status;
+      final status = await permission_handler.Permission.camera.status;
       return status.isGranted;
     } catch (e) {
       debugPrint('❌ خطأ في التحقق من إذن الكاميرا: $e');
@@ -284,34 +284,34 @@ class PermissionsService {
   }
 
   /// تحويل حالة الإذن إلى نتيجة
-  PermissionResult _mapPermissionStatus(PermissionStatus status, String permissionName) {
+  PermissionResult _mapPermissionStatus(permission_handler.PermissionStatus status, String permissionName) {
     switch (status) {
-      case PermissionStatus.granted:
+      case permission_handler.PermissionStatus.granted:
         debugPrint('✅ تم منح إذن $permissionName');
         return PermissionResult(
           isGranted: true,
           message: 'تم منح الإذن بنجاح',
         );
-      case PermissionStatus.denied:
+      case permission_handler.PermissionStatus.denied:
         debugPrint('❌ تم رفض إذن $permissionName');
         return PermissionResult(
           isGranted: false,
           message: 'تم رفض الإذن',
         );
-      case PermissionStatus.permanentlyDenied:
-        debugPrint('🚫 تم رفض إذن $permissionName نهائي<|im_start|>');
+      case permission_handler.PermissionStatus.permanentlyDenied:
+        debugPrint('🚫 تم رفض إذن $permissionName نهائياً');
         return PermissionResult(
           isGranted: false,
-          message: 'تم رفض الإذن نهائي<|im_start|>. يرجى تفعيله من الإعدادات',
+          message: 'تم رفض الإذن نهائياً. يرجى تفعيله من الإعدادات',
           isPermanentlyDenied: true,
         );
-      case PermissionStatus.restricted:
+      case permission_handler.PermissionStatus.restricted:
         debugPrint('⚠️ إذن $permissionName مقيد');
         return PermissionResult(
           isGranted: false,
           message: 'الإذن مقيد من قبل النظام',
         );
-      case PermissionStatus.limited:
+      case permission_handler.PermissionStatus.limited:
         debugPrint('⚠️ إذن $permissionName محدود');
         return PermissionResult(
           isGranted: true,
@@ -328,8 +328,16 @@ class PermissionsService {
   /// فتح إعدادات التطبيق
   Future<void> openAppSettings() async {
     try {
-      await openAppSettings();
-      debugPrint('📱 تم فتح إعدادات التطبيق');
+      // التحقق من المنصة أولاً
+      if (kIsWeb) {
+        // على الويب، نعرض رسالة توضيحية
+        debugPrint('🌐 فتح إعدادات التطبيق غير مدعوم على الويب');
+        return;
+      }
+
+      // استخدام مكتبة permission_handler لفتح الإعدادات
+      await permission_handler.openAppSettings();
+      debugPrint('📱 تم محاولة فتح إعدادات التطبيق');
     } catch (e) {
       debugPrint('❌ خطأ في فتح إعدادات التطبيق: $e');
     }

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../core/constants/constants.dart';
 import '../../core/utils/responsive_helper.dart';
@@ -5,6 +6,7 @@ import '../../core/animations/nawa_animations.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/services/notification_service.dart';
 import '../../core/services/permissions_service.dart';
+import '../../core/services/web_notification_service.dart';
 import '../../shared/models/models.dart';
 
 /// صفحة الإشعارات
@@ -164,21 +166,46 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   /// التحقق من أذونات الإشعارات
   Future<void> _checkNotificationPermissions() async {
-    final isGranted = await PermissionsService.instance.isNotificationPermissionGranted();
-    if (!isGranted && mounted) {
-      _showPermissionDialog();
-    }
+    // تأخير التحقق لتجنب مشاكل البناء
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+
+      if (kIsWeb) {
+        // للويب، نتحقق من دعم الإشعارات
+        final isSupported = WebNotificationService.instance.isNotificationSupported;
+        if (!isSupported && mounted) {
+          _showPermissionDialog();
+        }
+      } else {
+        // للموبايل، نتحقق من الأذونات العادية
+        try {
+          final isGranted = await PermissionsService.instance.isNotificationPermissionGranted();
+          if (!isGranted && mounted) {
+            _showPermissionDialog();
+          }
+        } catch (e) {
+          debugPrint('خطأ في التحقق من أذونات الإشعارات: $e');
+        }
+      }
+    });
   }
 
   /// عرض حوار طلب أذونات الإشعارات
   void _showPermissionDialog() {
-    PermissionsService.instance.showPermissionDialog(
-      context,
-      title: 'إذن الإشعارات مطلوب',
-      message: 'للحصول على إشعارات فورية حول التبرعات والمشاريع، يرجى منح إذن الإشعارات.',
-      permissionName: 'الإشعارات',
-      requestPermission: () => PermissionsService.instance.requestNotificationPermission(),
-    );
+    // التحقق من المنصة أولاً
+    if (kIsWeb) {
+      // للويب، نستخدم الحل المخصص
+      WebNotificationService.instance.showWebNotificationSettings(context);
+    } else {
+      // للموبايل، نستخدم الطريقة العادية
+      PermissionsService.instance.showPermissionDialog(
+        context,
+        title: 'إذن الإشعارات مطلوب',
+        message: 'للحصول على إشعارات فورية حول التبرعات والمشاريع، يرجى منح إذن الإشعارات.',
+        permissionName: 'الإشعارات',
+        requestPermission: () => PermissionsService.instance.requestNotificationPermission(),
+      );
+    }
   }
 
   @override
@@ -894,20 +921,27 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   /// اختبار إشعار محلي
   Future<void> _testNotification() async {
-    final success = await NotificationService.instance.showLocalNotification(
-      title: 'إشعار تجريبي 🔔',
-      body: 'هذا إشعار تجريبي من تطبيق نوى للتأكد من عمل الإشعارات بشكل صحيح',
-      type: NotificationType.general,
-      data: {
-        'action': 'test',
-        'timestamp': DateTime.now().toIso8601String(),
-      },
-    );
-
-    if (success) {
-      _showInfoMessage('تم إرسال إشعار تجريبي بنجاح! 🎉');
+    if (kIsWeb) {
+      // للويب، نستخدم الحل المخصص
+      await WebNotificationService.instance.sendTestNotification();
+      _showInfoMessage('تم إرسال إشعار تجريبي للويب! 🌐');
     } else {
-      _showInfoMessage('فشل في إرسال الإشعار. تحقق من الأذونات.');
+      // للموبايل، نستخدم الطريقة العادية
+      final success = await NotificationService.instance.showLocalNotification(
+        title: 'إشعار تجريبي 🔔',
+        body: 'هذا إشعار تجريبي من تطبيق نوى للتأكد من عمل الإشعارات بشكل صحيح',
+        type: NotificationType.general,
+        data: {
+          'action': 'test',
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+
+      if (success) {
+        _showInfoMessage('تم إرسال إشعار تجريبي بنجاح! 🎉');
+      } else {
+        _showInfoMessage('فشل في إرسال الإشعار. تحقق من الأذونات.');
+      }
     }
   }
 
