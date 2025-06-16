@@ -1,14 +1,27 @@
 import 'package:flutter/material.dart';
 
-/// مساعد التجاوب
+/// مساعد التجاوب المحسّن
 /// يوفر أدوات لجعل التطبيق متجاوب على جميع أحجام الشاشات
+/// مع دعم خاص للشاشات الصغيرة جداً (أقل من 360px)
 class ResponsiveHelper {
   // نقاط الكسر للشاشات المختلفة
-  static const double mobileBreakpoint = 600;
-  static const double tabletBreakpoint = 900;
-  static const double desktopBreakpoint = 1200;
+  static const double extraSmallBreakpoint = 360;  // الشاشات الصغيرة جداً
+  static const double smallBreakpoint = 480;       // الهواتف الصغيرة
+  static const double mobileBreakpoint = 600;      // الهواتف العادية
+  static const double tabletBreakpoint = 900;      // الأجهزة اللوحية
+  static const double desktopBreakpoint = 1200;    // أجهزة سطح المكتب
+  static const double largeDesktopBreakpoint = 1600; // الشاشات الكبيرة
 
   /// التحقق من نوع الجهاز
+  static bool isExtraSmall(BuildContext context) {
+    return MediaQuery.of(context).size.width < extraSmallBreakpoint;
+  }
+
+  static bool isSmallMobile(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return width >= extraSmallBreakpoint && width < smallBreakpoint;
+  }
+
   static bool isMobile(BuildContext context) {
     return MediaQuery.of(context).size.width < mobileBreakpoint;
   }
@@ -19,15 +32,23 @@ class ResponsiveHelper {
   }
 
   static bool isDesktop(BuildContext context) {
-    return MediaQuery.of(context).size.width >= tabletBreakpoint;
+    final width = MediaQuery.of(context).size.width;
+    return width >= tabletBreakpoint && width < largeDesktopBreakpoint;
+  }
+
+  static bool isLargeDesktop(BuildContext context) {
+    return MediaQuery.of(context).size.width >= largeDesktopBreakpoint;
   }
 
   /// الحصول على نوع الجهاز
   static DeviceType getDeviceType(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    if (width < extraSmallBreakpoint) return DeviceType.extraSmall;
+    if (width < smallBreakpoint) return DeviceType.smallMobile;
     if (width < mobileBreakpoint) return DeviceType.mobile;
     if (width < tabletBreakpoint) return DeviceType.tablet;
-    return DeviceType.desktop;
+    if (width < largeDesktopBreakpoint) return DeviceType.desktop;
+    return DeviceType.largeDesktop;
   }
 
   /// الحصول على عدد الأعمدة المناسب
@@ -43,23 +64,35 @@ class ResponsiveHelper {
 
   /// الحصول على المساحات المناسبة
   static double getSpacing(BuildContext context, {
+    double extraSmallSpacing = 4.0,
+    double smallMobileSpacing = 6.0,
     double mobileSpacing = 8.0,
     double tabletSpacing = 12.0,
     double desktopSpacing = 16.0,
+    double largeDesktopSpacing = 20.0,
   }) {
+    if (isExtraSmall(context)) return extraSmallSpacing;
+    if (isSmallMobile(context)) return smallMobileSpacing;
     if (isMobile(context)) return mobileSpacing;
     if (isTablet(context)) return tabletSpacing;
+    if (isLargeDesktop(context)) return largeDesktopSpacing;
     return desktopSpacing;
   }
 
   /// الحصول على حجم الخط المناسب
   static double getFontSize(BuildContext context, {
+    double extraSmallFontSize = 12.0,
+    double smallMobileFontSize = 13.0,
     double mobileFontSize = 14.0,
     double tabletFontSize = 16.0,
     double desktopFontSize = 18.0,
+    double largeDesktopFontSize = 20.0,
   }) {
+    if (isExtraSmall(context)) return extraSmallFontSize;
+    if (isSmallMobile(context)) return smallMobileFontSize;
     if (isMobile(context)) return mobileFontSize;
     if (isTablet(context)) return tabletFontSize;
+    if (isLargeDesktop(context)) return largeDesktopFontSize;
     return desktopFontSize;
   }
 
@@ -73,9 +106,13 @@ class ResponsiveHelper {
   /// الحصول على المساحة الجانبية
   static double getSidePadding(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    if (width < mobileBreakpoint) return 16.0;
-    if (width < tabletBreakpoint) return 32.0;
-    return (width - 1200) / 2; // توسيط المحتوى على الشاشات الكبيرة
+    if (width < extraSmallBreakpoint) return 8.0;   // شاشات صغيرة جداً
+    if (width < smallBreakpoint) return 12.0;       // هواتف صغيرة
+    if (width < mobileBreakpoint) return 16.0;      // هواتف عادية
+    if (width < tabletBreakpoint) return 24.0;      // أجهزة لوحية صغيرة
+    if (width < desktopBreakpoint) return 32.0;     // أجهزة لوحية كبيرة
+    if (width < largeDesktopBreakpoint) return (width - 1200) / 2; // سطح المكتب
+    return (width - 1600) / 2; // شاشات كبيرة
   }
 
   /// الحصول على نسبة العرض إلى الارتفاع للكروت
@@ -129,21 +166,142 @@ class ResponsiveHelper {
 
   /// الحصول على حجم الصورة الشخصية
   static double getAvatarSize(BuildContext context, {
+    double extraSmallSize = 32.0,
+    double smallMobileSize = 36.0,
     double mobileSize = 40.0,
     double tabletSize = 48.0,
     double desktopSize = 56.0,
+    double largeDesktopSize = 64.0,
   }) {
+    if (isExtraSmall(context)) return extraSmallSize;
+    if (isSmallMobile(context)) return smallMobileSize;
     if (isMobile(context)) return mobileSize;
     if (isTablet(context)) return tabletSize;
+    if (isLargeDesktop(context)) return largeDesktopSize;
     return desktopSize;
+  }
+
+  /// الحصول على حجم الخط المتجاوب بناءً على النوع
+  static double getResponsiveFontSize(BuildContext context, {
+    required double baseSize,
+    double scaleFactor = 1.0,
+  }) {
+    final deviceType = getDeviceType(context);
+    switch (deviceType) {
+      case DeviceType.extraSmall:
+        return (baseSize * 0.8 * scaleFactor).clamp(10.0, 100.0);
+      case DeviceType.smallMobile:
+        return (baseSize * 0.9 * scaleFactor).clamp(11.0, 100.0);
+      case DeviceType.mobile:
+        return (baseSize * 1.0 * scaleFactor).clamp(12.0, 100.0);
+      case DeviceType.tablet:
+        return (baseSize * 1.1 * scaleFactor).clamp(14.0, 100.0);
+      case DeviceType.desktop:
+        return (baseSize * 1.2 * scaleFactor).clamp(16.0, 100.0);
+      case DeviceType.largeDesktop:
+        return (baseSize * 1.3 * scaleFactor).clamp(18.0, 100.0);
+    }
+  }
+
+  /// الحصول على المساحة المتجاوبة
+  static double getResponsiveSpacing(BuildContext context, {
+    required double baseSpacing,
+  }) {
+    final deviceType = getDeviceType(context);
+    switch (deviceType) {
+      case DeviceType.extraSmall:
+        return baseSpacing * 0.5;
+      case DeviceType.smallMobile:
+        return baseSpacing * 0.7;
+      case DeviceType.mobile:
+        return baseSpacing * 1.0;
+      case DeviceType.tablet:
+        return baseSpacing * 1.2;
+      case DeviceType.desktop:
+        return baseSpacing * 1.4;
+      case DeviceType.largeDesktop:
+        return baseSpacing * 1.6;
+    }
+  }
+
+  /// التحقق من الحاجة لتخطيط مضغوط
+  static bool needsCompactLayout(BuildContext context) {
+    return isExtraSmall(context) || isSmallMobile(context);
+  }
+
+  /// الحصول على عدد الأعمدة للشاشات الصغيرة<|im_start|>
+  static int getCompactGridColumns(BuildContext context) {
+    if (isExtraSmall(context)) return 1;
+    if (isSmallMobile(context)) return 1;
+    if (isMobile(context)) return 2;
+    if (isTablet(context)) return 3;
+    return 4;
+  }
+
+  /// الحصول على ارتفاع العنصر المتجاوب
+  static double getResponsiveHeight(BuildContext context, {
+    required double baseHeight,
+  }) {
+    final deviceType = getDeviceType(context);
+    switch (deviceType) {
+      case DeviceType.extraSmall:
+        return baseHeight * 0.8;
+      case DeviceType.smallMobile:
+        return baseHeight * 0.9;
+      case DeviceType.mobile:
+        return baseHeight * 1.0;
+      case DeviceType.tablet:
+        return baseHeight * 1.1;
+      case DeviceType.desktop:
+        return baseHeight * 1.2;
+      case DeviceType.largeDesktop:
+        return baseHeight * 1.3;
+    }
+  }
+
+  /// الحصول على عرض العنصر المتجاوب
+  static double getResponsiveWidth(BuildContext context, {
+    required double baseWidth,
+    double? maxWidth,
+  }) {
+    final screenWidth = getScreenWidth(context);
+    final calculatedWidth = baseWidth * _getWidthScale(context);
+
+    if (maxWidth != null) {
+      return calculatedWidth.clamp(0, maxWidth);
+    }
+
+    return calculatedWidth.clamp(0, screenWidth * 0.9);
+  }
+
+  /// مقياس العرض الداخلي
+  static double _getWidthScale(BuildContext context) {
+    final deviceType = getDeviceType(context);
+    switch (deviceType) {
+      case DeviceType.extraSmall:
+        return 0.95;
+      case DeviceType.smallMobile:
+        return 0.92;
+      case DeviceType.mobile:
+        return 0.9;
+      case DeviceType.tablet:
+        return 0.85;
+      case DeviceType.desktop:
+        return 0.8;
+      case DeviceType.largeDesktop:
+        return 0.75;
+    }
   }
 }
 
-/// أنواع الأجهزة
+/// أنواع الأجهزة المحسّنة
 enum DeviceType {
-  mobile,
-  tablet,
-  desktop,
+  extraSmall,    // أقل من 360px
+  smallMobile,   // 360px - 480px
+  mobile,        // 480px - 600px
+  tablet,        // 600px - 900px
+  desktop,       // 900px - 1600px
+  largeDesktop,  // أكبر من 1600px
 }
 
 /// ويدجت للتخطيط المتجاوب
@@ -250,44 +408,4 @@ class ResponsiveGrid extends StatelessWidget {
   }
 }
 
-/// ويدجت للنص المتجاوب
-class ResponsiveText extends StatelessWidget {
-  final String text;
-  final TextStyle? style;
-  final double? mobileFontSize;
-  final double? tabletFontSize;
-  final double? desktopFontSize;
-  final TextAlign? textAlign;
-  final int? maxLines;
-  final TextOverflow? overflow;
 
-  const ResponsiveText(
-    this.text, {
-    super.key,
-    this.style,
-    this.mobileFontSize,
-    this.tabletFontSize,
-    this.desktopFontSize,
-    this.textAlign,
-    this.maxLines,
-    this.overflow,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final fontSize = ResponsiveHelper.getFontSize(
-      context,
-      mobileFontSize: mobileFontSize ?? 14.0,
-      tabletFontSize: tabletFontSize ?? 16.0,
-      desktopFontSize: desktopFontSize ?? 18.0,
-    );
-
-    return Text(
-      text,
-      style: (style ?? const TextStyle()).copyWith(fontSize: fontSize),
-      textAlign: textAlign,
-      maxLines: maxLines,
-      overflow: overflow,
-    );
-  }
-}

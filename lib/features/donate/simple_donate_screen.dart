@@ -166,15 +166,18 @@ class _SimpleDonateScreenState extends State<SimpleDonateScreen> {
                       ),
                     ),
                     child: Center(
-                      child: ResponsiveText(
+                      child: Text(
                         '\$${amount.toStringAsFixed(0)}',
                         style: TextStyle(
                           color: isSelected ? Colors.white : Colors.black,
                           fontWeight: FontWeight.w600,
+                          fontSize: ResponsiveHelper.getFontSize(
+                            context,
+                            mobileFontSize: 14.0,
+                            tabletFontSize: 16.0,
+                            desktopFontSize: 18.0,
+                          ),
                         ),
-                        mobileFontSize: 14,
-                        tabletFontSize: 16,
-                        desktopFontSize: 18,
                       ),
                     ),
                   ),

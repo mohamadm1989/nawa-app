@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import '../../core/constants/constants.dart';
 import '../../core/utils/responsive_helper.dart';
+import '../../core/utils/responsive_helper.dart';
 import '../../core/utils/mobile_responsive.dart';
 import '../../core/animations/nawa_animations.dart';
 import '../../shared/widgets/widgets.dart';
@@ -827,35 +828,25 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     }
 
     return Positioned(
-      top: MobileResponsive.isSmallScreen(context) ? 60 : 80,
-      right: MobileResponsive.getResponsivePadding(context, 16),
-      left: MobileResponsive.isSmallScreen(context)
-          ? MobileResponsive.getResponsivePadding(context, 16)
+      top: ResponsiveHelper.needsCompactLayout(context) ? 60 : 80,
+      right: ResponsiveConstants.getMediumSpacing(context),
+      left: ResponsiveHelper.needsCompactLayout(context)
+          ? ResponsiveConstants.getMediumSpacing(context)
           : null,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutBack,
         width: _showStats
-            ? (MobileResponsive.isSmallScreen(context)
+            ? (ResponsiveHelper.needsCompactLayout(context)
                 ? null
-                : MobileResponsive.getResponsiveWidth(context, 320))
+                : ResponsiveHelper.getResponsiveWidth(context, baseWidth: 320))
             : 0,
         height: _showStats
-            ? MobileResponsive.getResponsiveHeight(context, 400)
+            ? ResponsiveHelper.getResponsiveHeight(context, baseHeight: 400)
             : 0,
         child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.backgroundCard,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.shadowLight,
-                blurRadius: 12,
-                offset: const Offset(-4, 4),
-              ),
-            ],
-          ),
+          padding: ResponsiveConstants.getMediumPadding(context),
+          decoration: ResponsiveConstants.getResponsiveCardDecoration(context),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -863,15 +854,23 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 // العنوان
                 Row(
                   children: [
-                    const Icon(Icons.analytics, color: AppColors.primaryGreen),
-                    const SizedBox(width: 8),
-                    Text(
-                      'إحصائيات الخريطة',
-                      style: AppTextStyles.headlineSmall,
+                    Icon(
+                      Icons.analytics,
+                      color: AppColors.primaryGreen,
+                      size: ResponsiveConstants.getMediumIconSize(context),
+                    ),
+                    SizedBox(width: ResponsiveConstants.getSmallSpacing(context)),
+                    Expanded(
+                      child: ResponsiveText.subheadline(
+                        'إحصائيات الخريطة',
+                        baseStyle: AppTextStyles.headlineSmall,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: ResponsiveConstants.getMediumSpacing(context)),
 
                 // الإحصائيات العامة
                 _buildStatCard(
@@ -986,52 +985,11 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 16,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: color,
-                  ),
-                ),
-                Text(
-                  title,
-                  style: AppTextStyles.labelSmall.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+    return AppLayouts.statisticCard(
+      title: title,
+      value: value,
+      icon: icon,
+      color: color,
     );
   }
 

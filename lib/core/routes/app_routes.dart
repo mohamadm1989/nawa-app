@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../safety/safety_monitor.dart';
 import '../../features/welcome/welcome_screen.dart';
 import '../../features/auth/login_screen.dart';
 import '../../features/auth/register_screen.dart';
@@ -12,7 +13,6 @@ import '../../features/profile/profile_screen.dart';
 import '../../features/notifications/simple_notifications_screen.dart';
 import '../../features/map/map_screen.dart';
 import '../../features/favorites/favorites_screen.dart';
-import '../../features/settings/settings_screen.dart';
 import '../../features/settings/permissions_settings_screen.dart';
 import '../../features/support/support_screen.dart';
 import '../../features/faq/faq_screen.dart';
@@ -20,9 +20,16 @@ import '../../features/terms/terms_screen.dart';
 import '../../features/privacy/privacy_screen.dart';
 import '../../features/about/about_screen.dart';
 import '../../features/search/search_screen.dart';
+import '../../features/donations_history/donations_history_screen.dart';
+import '../../features/profile/edit_profile_screen.dart';
+import '../../features/profile/profile_share_screen.dart';
+import '../../features/settings/app_settings_screen.dart';
 import '../../features/add_project/add_project_screen.dart';
 import '../../features/edit_project/edit_project_screen.dart';
 import '../../features/manage_projects/manage_projects_screen.dart';
+import '../../features/debug/responsive_test_screen.dart';
+import '../../features/debug/accessibility_test_screen.dart';
+import '../../features/debug/ux_test_screen.dart';
 import '../../test_font_screen.dart';
 
 /// نظام التوجيه للتطبيق
@@ -47,6 +54,9 @@ class AppRoutes {
   static const String manageProjects = '/manage-projects';
   static const String map = '/map';
   static const String testFont = '/test-font';
+  static const String responsiveTest = '/responsive-test';
+  static const String accessibilityTest = '/accessibility-test';
+  static const String uxTest = '/ux-test';
   static const String search = '/search';
   static const String favorites = '/favorites';
   static const String notifications = '/notifications';
@@ -57,6 +67,9 @@ class AppRoutes {
   static const String terms = '/terms';
   static const String privacy = '/privacy';
   static const String about = '/about';
+  static const String donationsHistory = '/donations-history';
+  static const String editProfile = '/edit-profile';
+  static const String shareProfile = '/share-profile';
 
   /// خريطة جميع المسارات
   static Map<String, WidgetBuilder> get routes {
@@ -160,7 +173,7 @@ class AppRoutes {
 
       case AppRoutes.settings:
         return MaterialPageRoute(
-          builder: (context) => const SettingsScreen(),
+          builder: (context) => const AppSettingsScreen(),
         );
 
       case AppRoutes.permissionsSettings:
@@ -193,6 +206,21 @@ class AppRoutes {
           builder: (context) => const AboutScreen(),
         );
 
+      case AppRoutes.donationsHistory:
+        return MaterialPageRoute(
+          builder: (context) => const DonationsHistoryScreen(),
+        );
+
+      case AppRoutes.editProfile:
+        return MaterialPageRoute(
+          builder: (context) => const EditProfileScreen(),
+        );
+
+      case AppRoutes.shareProfile:
+        return MaterialPageRoute(
+          builder: (context) => const ProfileShareScreen(),
+        );
+
       case AppRoutes.map:
         return MaterialPageRoute(
           builder: (context) => const MapScreen(),
@@ -201,6 +229,21 @@ class AppRoutes {
       case AppRoutes.testFont:
         return MaterialPageRoute(
           builder: (context) => const TestFontScreen(),
+        );
+
+      case AppRoutes.responsiveTest:
+        return MaterialPageRoute(
+          builder: (context) => const ResponsiveTestScreen(),
+        );
+
+      case AppRoutes.accessibilityTest:
+        return MaterialPageRoute(
+          builder: (context) => const AccessibilityTestScreen(),
+        );
+
+      case AppRoutes.uxTest:
+        return MaterialPageRoute(
+          builder: (context) => const UXTestScreen(),
         );
 
       default:
@@ -329,6 +372,29 @@ class AppRoutes {
     Navigator.of(context).pushNamed(about);
   }
 
+  static void pushDonationsHistory(BuildContext context) {
+    Navigator.of(context).pushNamed(donationsHistory);
+  }
+
+  /// التوجيه إلى صفحة تعديل الملف الشخصي مع إرجاع النتيجة
+  /// إرجاع: Future<bool?> - true إذا تم حفظ التغييرات، false أو null إذا تم الإلغاء
+  static Future<bool?> pushEditProfile(BuildContext context) {
+    try {
+      return Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (context) => const EditProfileScreen(),
+        ),
+      );
+    } catch (e) {
+      SafetyMonitor.logError('Navigation Error in pushEditProfile', e);
+      return Future.value(null);
+    }
+  }
+
+  static void pushShareProfile(BuildContext context) {
+    Navigator.of(context).pushNamed(shareProfile);
+  }
+
   /// العودة للصفحة السابقة
   static void pop(BuildContext context, [dynamic result]) {
     Navigator.of(context).pop(result);
@@ -362,6 +428,33 @@ class AppRoutes {
       routeName,
       arguments: arguments,
     );
+  }
+
+  /// التوجيه إلى صفحة اختبار الاستجابة
+  static void pushResponsiveTest(BuildContext context) {
+    try {
+      Navigator.of(context).pushNamed(responsiveTest);
+    } catch (e) {
+      debugPrint('خطأ في التوجيه إلى صفحة اختبار الاستجابة: $e');
+    }
+  }
+
+  /// التوجيه إلى صفحة اختبار إمكانية الوصول
+  static void pushAccessibilityTest(BuildContext context) {
+    try {
+      Navigator.of(context).pushNamed(accessibilityTest);
+    } catch (e) {
+      debugPrint('خطأ في التوجيه إلى صفحة اختبار إمكانية الوصول: $e');
+    }
+  }
+
+  /// التوجيه إلى صفحة اختبار تجربة المستخدم
+  static void pushUXTest(BuildContext context) {
+    try {
+      Navigator.of(context).pushNamed(uxTest);
+    } catch (e) {
+      debugPrint('خطأ في التوجيه إلى صفحة اختبار تجربة المستخدم: $e');
+    }
   }
 }
 

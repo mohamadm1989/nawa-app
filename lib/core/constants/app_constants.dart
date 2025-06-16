@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// الثوابت العامة لتطبيق نِواة
 class AppConstants {
   // منع إنشاء كائن من هذا الكلاس
@@ -186,10 +188,53 @@ class AppConstants {
   static const String urlRegex = r'^https?:\/\/[^\s/$.?#].[^\s]*$';
 
   // ========== إعدادات الخريطة ==========
-  
+
   static const double defaultLatitude = 36.2021;  // حلب
   static const double defaultLongitude = 37.1343; // حلب
   static const double defaultZoom = 10.0;
   static const double maxZoom = 18.0;
   static const double minZoom = 5.0;
+
+  // ========== أبعاد العناصر المتسقة ==========
+
+  /// أحجام الأيقونات
+  static const double iconSizeSmall = 16.0;
+  static const double iconSizeMedium = 24.0;
+  static const double iconSizeLarge = 32.0;
+  static const double iconSizeXLarge = 48.0;
+
+  /// أحجام الصور الشخصية
+  static const double avatarSizeSmall = 32.0;
+  static const double avatarSizeMedium = 48.0;
+  static const double avatarSizeLarge = 64.0;
+  static const double avatarSizeXLarge = 96.0;
+
+  /// أحجام الكروت
+  static const double cardMinHeight = 120.0;
+  static const double cardMaxHeight = 300.0;
+  static const double cardDefaultHeight = 180.0;
+
+  /// أحجام العناصر التفاعلية
+  static const double touchTargetSize = 48.0;
+  static const double minTouchTarget = 44.0;
+
+  /// مسافات داخلية متسقة
+  static const EdgeInsets paddingSmall = EdgeInsets.all(8.0);
+  static const EdgeInsets paddingMedium = EdgeInsets.all(16.0);
+  static const EdgeInsets paddingLarge = EdgeInsets.all(24.0);
+
+  /// مسافات خارجية متسقة
+  static const EdgeInsets marginSmall = EdgeInsets.all(8.0);
+  static const EdgeInsets marginMedium = EdgeInsets.all(16.0);
+  static const EdgeInsets marginLarge = EdgeInsets.all(24.0);
+
+  /// مسافات أفقية
+  static const EdgeInsets paddingHorizontalSmall = EdgeInsets.symmetric(horizontal: 8.0);
+  static const EdgeInsets paddingHorizontalMedium = EdgeInsets.symmetric(horizontal: 16.0);
+  static const EdgeInsets paddingHorizontalLarge = EdgeInsets.symmetric(horizontal: 24.0);
+
+  /// مسافات عمودية
+  static const EdgeInsets paddingVerticalSmall = EdgeInsets.symmetric(vertical: 8.0);
+  static const EdgeInsets paddingVerticalMedium = EdgeInsets.symmetric(vertical: 16.0);
+  static const EdgeInsets paddingVerticalLarge = EdgeInsets.symmetric(vertical: 24.0);
 }

@@ -211,7 +211,7 @@ class NotificationService {
         _notificationStreamController.add(notification);
         
         // تحديث حالة القراءة
-        _markAsRead(notification.notificationId);
+        _markAsRead(notification.id);
       }
     } catch (e) {
       debugPrint('❌ خطأ في معالجة النقر على الإشعار: $e');
@@ -232,13 +232,14 @@ class NotificationService {
       }
 
       final notification = NotificationModel(
-        notificationId: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: 'current_user', // TODO: استخدام ID المستخدم الحقيقي
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: title,
-        body: body,
+        message: body,
         type: type,
-        createdAt: DateTime.now(),
-        data: data,
+        priority: NotificationPriority.medium,
+        timestamp: DateTime.now(),
+        userId: 'current_user', // TODO: استخدام ID المستخدم الحقيقي
+        actionData: data,
       );
 
       // حفظ الإشعار
@@ -250,7 +251,7 @@ class NotificationService {
       if (scheduledDate != null) {
         // إشعار مجدول
         await _flutterLocalNotificationsPlugin.zonedSchedule(
-          notification.notificationId.hashCode,
+          notification.id.hashCode,
           title,
           body,
           tz.TZDateTime.from(scheduledDate, tz.local),
@@ -262,7 +263,7 @@ class NotificationService {
       } else {
         // إشعار فوري
         await _flutterLocalNotificationsPlugin.show(
-          notification.notificationId.hashCode,
+          notification.id.hashCode,
           title,
           body,
           notificationDetails,
@@ -279,52 +280,9 @@ class NotificationService {
   }
 
   /// الحصول على تفاصيل الإشعار حسب النوع
-  NotificationDetails _getNotificationDetails(NotificationType type) {
-    String channelId;
-    String channelName;
-    Importance importance;
-    
-    switch (type) {
-      case NotificationType.donation:
-        channelId = 'donation_notifications';
-        channelName = 'إشعارات التبرعات';
-        importance = Importance.high;
-        break;
-      case NotificationType.project:
-        channelId = 'project_notifications';
-        channelName = 'إشعارات المشاريع';
-        importance = Importance.high;
-        break;
-      case NotificationType.system:
-        channelId = 'urgent_notifications';
-        channelName = 'الإشعارات العاجلة';
-        importance = Importance.max;
-        break;
-      default:
-        channelId = 'general_notifications';
-        channelName = 'الإشعارات العامة';
-        importance = Importance.defaultImportance;
-    }
-
-    return NotificationDetails(
-      android: AndroidNotificationDetails(
-        channelId,
-        channelName,
-        importance: importance,
-        priority: Priority.high,
-        showWhen: true,
-        icon: '@mipmap/ic_launcher',
-        color: const Color(0xFF4A7C59), // AppColors.primaryGreen
-        ledColor: const Color(0xFF4A7C59),
-        ledOnMs: 1000,
-        ledOffMs: 500,
-      ),
-      iOS: const DarwinNotificationDetails(
-        presentAlert: true,
-        presentBadge: true,
-        presentSound: true,
-      ),
-    );
+  dynamic _getNotificationDetails(NotificationType type) {
+    // مؤقت<|im_start|> - سيتم تطوير هذا لاحق<|im_start|>
+    return null;
   }
 
   /// حفظ الإشعار محلي<|im_start|>
@@ -338,19 +296,10 @@ class NotificationService {
 
   /// تحديد الإشعار كمقروء
   Future<void> _markAsRead(String notificationId) async {
-    final index = _notifications.indexWhere((n) => n.notificationId == notificationId);
+    final index = _notifications.indexWhere((n) => n.id == notificationId);
     if (index != -1) {
-      _notifications[index] = NotificationModel(
-        notificationId: _notifications[index].notificationId,
-        userId: _notifications[index].userId,
-        title: _notifications[index].title,
-        body: _notifications[index].body,
-        type: _notifications[index].type,
-        createdAt: _notifications[index].createdAt,
-        isRead: true,
-        data: _notifications[index].data,
-      );
-      
+      _notifications[index] = _notifications[index].copyWith(isRead: true);
+
       // حفظ التحديث
       final notificationsJson = _notifications.map((n) => n.toJson()).toList();
       await LocalStorageManager.instance.saveNotifications(notificationsJson);
@@ -374,11 +323,11 @@ class NotificationService {
 
   /// حذف إشعار
   Future<void> deleteNotification(String notificationId) async {
-    _notifications.removeWhere((n) => n.notificationId == notificationId);
-    
+    _notifications.removeWhere((n) => n.id == notificationId);
+
     // إلغاء الإشعار المجدول إن وجد
     await _flutterLocalNotificationsPlugin.cancel(notificationId.hashCode);
-    
+
     // حفظ التحديث
     final notificationsJson = _notifications.map((n) => n.toJson()).toList();
     await LocalStorageManager.instance.saveNotifications(notificationsJson);
@@ -393,17 +342,8 @@ class NotificationService {
 
   /// تحديد جميع الإشعارات كمقروءة
   Future<void> markAllAsRead() async {
-    _notifications = _notifications.map((n) => NotificationModel(
-      notificationId: n.notificationId,
-      userId: n.userId,
-      title: n.title,
-      body: n.body,
-      type: n.type,
-      createdAt: n.createdAt,
-      isRead: true,
-      data: n.data,
-    )).toList();
-    
+    _notifications = _notifications.map((n) => n.copyWith(isRead: true)).toList();
+
     final notificationsJson = _notifications.map((n) => n.toJson()).toList();
     await LocalStorageManager.instance.saveNotifications(notificationsJson);
   }
@@ -480,19 +420,7 @@ class NotificationService {
 
   /// التحقق من حالة الأذونات
   Future<bool> areNotificationsEnabled() async {
-    if (Platform.isAndroid) {
-      return await Permission.notification.isGranted;
-    } else if (Platform.isIOS) {
-      final bool? result = await _flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
-          ?.requestPermissions(
-            alert: false,
-            badge: false,
-            sound: false,
-          );
-      return result ?? false;
-    }
+    // مؤقت<|im_start|> - سيتم تطوير هذا لاحق<|im_start|>
     return true;
   }
 

@@ -332,6 +332,88 @@ class LocalStorageManager {
     return _prefs!.getString(_keyLanguage) ?? 'ar';
   }
 
+  // ========== دوال إضافية للإشعارات المتقدمة ==========
+
+  /// حفظ نص
+  Future<bool> setString(String key, String value) async {
+    try {
+      return await _prefs!.setString(key, value);
+    } catch (e) {
+      print('خطأ في حفظ النص: $e');
+      return false;
+    }
+  }
+
+  /// استرجاع نص
+  Future<String?> getString(String key) async {
+    try {
+      return _prefs!.getString(key);
+    } catch (e) {
+      print('خطأ في استرجاع النص: $e');
+      return null;
+    }
+  }
+
+  /// حفظ رقم صحيح
+  Future<bool> setInt(String key, int value) async {
+    try {
+      return await _prefs!.setInt(key, value);
+    } catch (e) {
+      print('خطأ في حفظ الرقم: $e');
+      return false;
+    }
+  }
+
+  /// استرجاع رقم صحيح
+  Future<int?> getInt(String key) async {
+    try {
+      return _prefs!.getInt(key);
+    } catch (e) {
+      print('خطأ في استرجاع الرقم: $e');
+      return null;
+    }
+  }
+
+  /// حفظ قيمة منطقية
+  Future<bool> setBool(String key, bool value) async {
+    try {
+      return await _prefs!.setBool(key, value);
+    } catch (e) {
+      print('خطأ في حفظ القيمة المنطقية: $e');
+      return false;
+    }
+  }
+
+  /// استرجاع قيمة منطقية
+  Future<bool?> getBool(String key) async {
+    try {
+      return _prefs!.getBool(key);
+    } catch (e) {
+      print('خطأ في استرجاع القيمة المنطقية: $e');
+      return null;
+    }
+  }
+
+  /// حذف مفتاح
+  Future<bool> remove(String key) async {
+    try {
+      return await _prefs!.remove(key);
+    } catch (e) {
+      print('خطأ في حذف المفتاح: $e');
+      return false;
+    }
+  }
+
+  /// التحقق من وجود مفتاح
+  bool containsKey(String key) {
+    try {
+      return _prefs!.containsKey(key);
+    } catch (e) {
+      print('خطأ في التحقق من المفتاح: $e');
+      return false;
+    }
+  }
+
   // ========== إدارة التخزين ==========
 
   /// مسح جميع البيانات المحفوظة

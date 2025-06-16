@@ -4,6 +4,7 @@ import '../../core/constants/constants.dart';
 import '../../core/utils/responsive_helper.dart';
 import '../../core/animations/nawa_animations.dart';
 import '../../core/animations/celebration_animations.dart';
+import '../../core/routes/app_routes.dart';
 import '../../shared/widgets/widgets.dart';
 
 /// صفحة الملف الشخصي
@@ -110,25 +111,47 @@ class _ProfileScreenState extends State<ProfileScreen>
       backgroundColor: AppColors.backgroundPrimary,
       appBar: AppBar(
         backgroundColor: AppColors.primaryGreen,
-        elevation: 0,
+        elevation: 2.0,
         leading: Container(),
-        title: const Text(
+        title: AccessibleText(
           'الملف الشخصي',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'Cairo',
+          style: AccessibilityStyles.accessibleHeadlineStyle(context).copyWith(
+            color: AppColors.textOnColor,
           ),
+          semanticLabel: 'صفحة الملف الشخصي',
+          isHeader: true,
         ),
         centerTitle: true,
+        iconTheme: const IconThemeData(
+          color: AppColors.textOnColor,
+          size: AppConstants.iconSizeMedium,
+        ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: Colors.white),
-            onPressed: _showEditProfile,
+          InteractionFeedback.createTapEffect(
+            onTap: () {
+              InteractionFeedback.showInfoFeedback(context, message: 'فتح صفحة تعديل الملف الشخصي');
+              _showEditProfile();
+            },
+            child: AccessibleIcon(
+              icon: Icons.edit,
+              semanticLabel: 'تعديل الملف الشخصي',
+              onTap: () {
+                AccessibilityHelper.announceToScreenReader(context, 'فتح صفحة تعديل الملف الشخصي');
+                _showEditProfile();
+              },
+              color: AppColors.textOnColor,
+              tooltip: 'تعديل الملف الشخصي',
+            ),
           ),
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            onPressed: _showSettings,
+          AccessibleIcon(
+            icon: Icons.settings,
+            semanticLabel: 'الإعدادات',
+            onTap: () {
+              AccessibilityHelper.announceToScreenReader(context, 'فتح الإعدادات');
+              _showSettings();
+            },
+            color: AppColors.textOnColor,
+            tooltip: 'الإعدادات',
           ),
         ],
       ),
@@ -224,84 +247,39 @@ class _ProfileScreenState extends State<ProfileScreen>
   Widget _buildUserProfileHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: ResponsiveConstants.getLargePadding(context),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.primaryGreen,
-            AppColors.primaryGreen.withValues(alpha: 0.8),
-          ],
-        ),
+        gradient: AppColors.primaryGradient,
       ),
       child: Column(
         children: [
           // صورة المستخدم
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 3),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: 37,
-              backgroundColor: AppColors.primaryGreen.withValues(alpha: 0.8),
-              child: const Icon(
-                Icons.person,
-                size: 40,
-                color: Colors.white,
-              ),
-            ),
+          AppStyles.circularImage(
+            imageUrl: _userProfile['avatar'] ?? 'https://via.placeholder.com/150',
+            size: ResponsiveConstants.getLargeAvatarSize(context),
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: ResponsiveConstants.getMediumSpacing(context)),
 
           // اسم المستخدم
-          const Text(
-            'أحمد محمد الطيبي',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontFamily: 'Cairo',
+          AccessibleText(
+            _userProfile['name'] ?? 'أحمد محمد الطيبي',
+            style: AccessibilityStyles.accessibleHeadlineStyle(context).copyWith(
+              color: AppColors.textOnColor,
             ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            semanticLabel: 'اسم المستخدم: ${_userProfile['name'] ?? 'أحمد محمد الطيبي'}',
+            isHeader: true,
           ),
 
-          const SizedBox(height: 8),
+          SizedBox(height: ResponsiveConstants.getSmallSpacing(context)),
 
           // المستوى والنقاط
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Icon(Icons.star, color: Colors.amber, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  'المستوى 4 • 1250 نقطة',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'Cairo',
-                  ),
-                ),
-              ],
-            ),
+          AppStyles.statusBadge(
+            text: 'المستوى 4 • 1250 نقطة',
+            color: AppColors.warning,
           ),
         ],
       ),
@@ -574,7 +552,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                         Text(
                           'المستوى 4 • 1250 نقطة',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Colors.white.withValues(alpha: 0.9),
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
                             fontFamily: 'Cairo',
@@ -638,12 +616,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                   CircleAvatar(
                     radius: 40, // تقليل الحجم
                     backgroundColor: AppColors.secondaryBeige,
-                    backgroundImage: _userProfile['avatar'] != null
-                        ? NetworkImage(_userProfile['avatar']!)
+                    backgroundImage: UserDataManager.getSafeString(_userProfile, 'avatar', '').isNotEmpty
+                        ? NetworkImage(UserDataManager.getSafeString(_userProfile, 'avatar', ''))
                         : null,
-                    child: _userProfile['avatar'] == null
+                    child: UserDataManager.getSafeString(_userProfile, 'avatar', '').isEmpty
                         ? Text(
-                            _userProfile['name'].substring(0, 1),
+                            UserDataManager.getSafeString(_userProfile, 'name', 'م').substring(0, 1),
                             style: const TextStyle(
                               fontSize: 28, // تقليل الحجم
                               fontWeight: FontWeight.bold,
@@ -654,7 +632,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                   ),
 
                   // شارة التحقق
-                  if (_userProfile['verified'])
+                  if (UserDataManager.getSafeBool(_userProfile, 'verified', false))
                     Positioned(
                       bottom: 0,
                       right: 0,
@@ -678,7 +656,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
               // اسم المستخدم
               Text(
-                _userProfile['name'],
+                _userProfile['name'] ?? 'مستخدم',
                 style: AppTextStyles.headlineMedium.copyWith(
                   color: AppColors.textOnColor,
                   fontWeight: FontWeight.bold,
@@ -709,7 +687,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '${_userStats['rank']} - المستوى ${_userStats['level']}',
+                      '${UserDataManager.getSafeString(_userStats, 'rank', 'مبتدئ')} - المستوى ${UserDataManager.getSafeInt(_userStats, 'level', 1)}',
                       style: AppTextStyles.labelMedium.copyWith(
                         color: AppColors.primaryGreen,
                         fontWeight: FontWeight.w600,
@@ -724,7 +702,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
               // الوصف
               Text(
-                _userProfile['bio'],
+                _userProfile['bio'] ?? 'مرحباً بكم في نوى',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textOnColor.withValues(alpha: 0.9),
                   fontSize: 14, // تقليل الحجم
@@ -742,22 +720,35 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Widget _buildQuickStats() {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.backgroundCard,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ResponsiveHelper.isMobile(context)
-          ? _buildMobileStats()
-          : _buildTabletDesktopStats(),
+      margin: ResponsiveConstants.getMediumPadding(context),
+      padding: ResponsiveConstants.getMediumPadding(context),
+      decoration: ResponsiveConstants.getResponsiveCardDecoration(context),
+      child: ResponsiveHelper.needsCompactLayout(context)
+          ? _buildCompactStats()
+          : ResponsiveHelper.isMobile(context)
+              ? _buildMobileStats()
+              : _buildTabletDesktopStats(),
+    );
+  }
+
+  Widget _buildCompactStats() {
+    // تخطيط مضغوط للشاشات الصغيرة جداً
+    return Column(
+      children: [
+        _buildStatCard(
+          title: 'إجمالي التبرعات',
+          value: '\$${UserDataManager.getSafeDouble(_userStats, 'totalDonations', 0.0).toStringAsFixed(0)}',
+          icon: Icons.attach_money,
+          color: AppColors.success,
+        ),
+        SizedBox(height: ResponsiveConstants.getSmallSpacing(context)),
+        _buildStatCard(
+          title: 'المشاريع المدعومة',
+          value: '${UserDataManager.getSafeInt(_userStats, 'projectsSupported', 0)}',
+          icon: Icons.favorite,
+          color: AppColors.error,
+        ),
+      ],
     );
   }
 
@@ -769,38 +760,38 @@ class _ProfileScreenState extends State<ProfileScreen>
             Expanded(
               child: _buildStatCard(
                 title: 'إجمالي التبرعات',
-                value: '\$${_userStats['totalDonations'].toStringAsFixed(0)}',
+                value: '\$${UserDataManager.getSafeDouble(_userStats, 'totalDonations', 0.0).toStringAsFixed(0)}',
                 icon: Icons.attach_money,
                 color: AppColors.success,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: ResponsiveConstants.getSmallSpacing(context)),
             Expanded(
               child: _buildStatCard(
                 title: 'المشاريع المدعومة',
-                value: '${_userStats['projectsSupported']}',
+                value: '${UserDataManager.getSafeInt(_userStats, 'projectsSupported', 0)}',
                 icon: Icons.favorite,
                 color: AppColors.error,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: ResponsiveConstants.getMediumSpacing(context)),
         Row(
           children: [
             Expanded(
               child: _buildStatCard(
                 title: 'نقاط التأثير',
-                value: '${_userStats['impactPoints']}',
+                value: '${UserDataManager.getSafeInt(_userStats, 'impactPoints', 0)}',
                 icon: Icons.star,
                 color: AppColors.warning,
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: ResponsiveConstants.getSmallSpacing(context)),
             Expanded(
               child: _buildStatCard(
                 title: 'المستوى',
-                value: '${_userStats['level']}',
+                value: '${UserDataManager.getSafeInt(_userStats, 'level', 1)}',
                 icon: Icons.trending_up,
                 color: AppColors.primaryGreen,
               ),
@@ -817,7 +808,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         Expanded(
           child: _buildStatCard(
             title: 'إجمالي التبرعات',
-            value: '\$${_userStats['totalDonations'].toStringAsFixed(0)}',
+            value: '\$${UserDataManager.getSafeDouble(_userStats, 'totalDonations', 0.0).toStringAsFixed(0)}',
             icon: Icons.attach_money,
             color: AppColors.success,
           ),
@@ -826,7 +817,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         Expanded(
           child: _buildStatCard(
             title: 'المشاريع المدعومة',
-            value: '${_userStats['projectsSupported']}',
+            value: '${UserDataManager.getSafeInt(_userStats, 'projectsSupported', 0)}',
             icon: Icons.favorite,
             color: AppColors.error,
           ),
@@ -835,7 +826,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         Expanded(
           child: _buildStatCard(
             title: 'نقاط التأثير',
-            value: '${_userStats['impactPoints']}',
+            value: '${UserDataManager.getSafeInt(_userStats, 'impactPoints', 0)}',
             icon: Icons.star,
             color: AppColors.warning,
           ),
@@ -850,54 +841,11 @@ class _ProfileScreenState extends State<ProfileScreen>
     required IconData icon,
     required Color color,
   }) {
-    return Container(
-      height: 120, // ارتفاع ثابت لمنع التداخل
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 8),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              value,
-              style: AppTextStyles.numberMedium.copyWith(
-                color: color,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-            ),
-          ),
-          const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Text(
-              title,
-              style: AppTextStyles.labelSmall.copyWith(
-                fontSize: 11,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
+    return AppLayouts.statisticCard(
+      title: title,
+      value: value,
+      icon: icon,
+      color: color,
     );
   }
 
@@ -1031,7 +979,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               text: 'عرض جميع التبرعات',
               icon: Icons.list,
               onPressed: () {
-                // TODO: الانتقال لصفحة جميع التبرعات
+                AppRoutes.pushDonationsHistory(context);
               },
             ),
           ),
@@ -1041,10 +989,10 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildLevelProgress() {
-    final currentPoints = _userStats['impactPoints'];
-    final nextLevelPoints = _userStats['nextLevelPoints'];
+    final currentPoints = UserDataManager.getSafeInt(_userStats, 'impactPoints', 0);
+    final nextLevelPoints = UserDataManager.getSafeInt(_userStats, 'nextLevelPoints', 100);
     final totalPointsForNextLevel = currentPoints + nextLevelPoints;
-    final progress = currentPoints / totalPointsForNextLevel;
+    final progress = totalPointsForNextLevel > 0 ? currentPoints / totalPointsForNextLevel : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -1067,13 +1015,13 @@ class _ProfileScreenState extends State<ProfileScreen>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'المستوى ${_userStats['level']}',
+                'المستوى ${UserDataManager.getSafeInt(_userStats, 'level', 1)}',
                 style: AppTextStyles.headlineSmall.copyWith(
                   color: AppColors.primaryGreen,
                 ),
               ),
               Text(
-                'المستوى ${_userStats['level'] + 1}',
+                'المستوى ${UserDataManager.getSafeInt(_userStats, 'level', 1) + 1}',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
@@ -1282,7 +1230,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Widget _buildAchievementCard(Map<String, dynamic> achievement) {
-    final isEarned = achievement['earned'];
+    final isEarned = UserDataManager.getSafeBool(achievement, 'earned', false);
 
     return InteractiveAnimation(
       onTap: isEarned ? () => _showAchievementDetails(achievement) : null,
@@ -1359,12 +1307,12 @@ class _ProfileScreenState extends State<ProfileScreen>
                 overflow: TextOverflow.ellipsis,
               ),
 
-              if (isEarned && achievement['date'] != null) ...[
+              if (isEarned && UserDataManager.getSafeString(achievement, 'date', '').isNotEmpty) ...[
                 const SizedBox(height: 6), // تقليل المسافة
                 Text(
-                  achievement['date'],
+                  UserDataManager.getSafeString(achievement, 'date', ''),
                   style: AppTextStyles.labelSmall.copyWith(
-                    color: achievement['color'],
+                    color: achievement['color'] as Color? ?? AppColors.primaryGreen,
                     fontWeight: FontWeight.w600,
                     fontSize: 10, // تقليل حجم الخط
                   ),
@@ -1389,11 +1337,11 @@ class _ProfileScreenState extends State<ProfileScreen>
             title: 'المعلومات الشخصية',
             icon: Icons.person,
             items: [
-              {'label': 'الاسم', 'value': _userProfile['name']},
-              {'label': 'البريد الإلكتروني', 'value': _userProfile['email']},
-              {'label': 'رقم الهاتف', 'value': _userProfile['phone']},
-              {'label': 'الموقع', 'value': _userProfile['location']},
-              {'label': 'تاريخ الانضمام', 'value': _userProfile['joinDate']},
+              {'label': 'الاسم', 'value': _userProfile['name'] ?? 'غير محدد'},
+              {'label': 'البريد الإلكتروني', 'value': _userProfile['email'] ?? 'محمي للأمان'},
+              {'label': 'رقم الهاتف', 'value': _userProfile['phone'] ?? 'محمي للأمان'},
+              {'label': 'الموقع', 'value': _userProfile['location'] ?? 'محمي للأمان'},
+              {'label': 'تاريخ الانضمام', 'value': _userProfile['joinDate'] ?? 'غير محدد'},
             ],
           ),
 
@@ -1404,11 +1352,11 @@ class _ProfileScreenState extends State<ProfileScreen>
             title: 'الإحصائيات التفصيلية',
             icon: Icons.analytics,
             items: [
-              {'label': 'إجمالي التبرعات', 'value': '\$${_userStats['totalDonations'].toStringAsFixed(0)}'},
-              {'label': 'عدد التبرعات', 'value': '${_userStats['donationsCount']}'},
-              {'label': 'المشاريع المدعومة', 'value': '${_userStats['projectsSupported']}'},
-              {'label': 'نقاط التأثير', 'value': '${_userStats['impactPoints']}'},
-              {'label': 'الرتبة الحالية', 'value': _userStats['rank']},
+              {'label': 'إجمالي التبرعات', 'value': '\$${UserDataManager.getSafeDouble(_userStats, 'totalDonations', 0.0).toStringAsFixed(0)}'},
+              {'label': 'عدد التبرعات', 'value': '${UserDataManager.getSafeInt(_userStats, 'donationsCount', 0)}'},
+              {'label': 'المشاريع المدعومة', 'value': '${UserDataManager.getSafeInt(_userStats, 'projectsSupported', 0)}'},
+              {'label': 'نقاط التأثير', 'value': '${UserDataManager.getSafeInt(_userStats, 'impactPoints', 0)}'},
+              {'label': 'الرتبة الحالية', 'value': UserDataManager.getSafeString(_userStats, 'rank', 'غير محدد')},
             ],
           ),
 
@@ -1566,25 +1514,28 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   // ========== معالجات الأحداث ==========
 
-  void _showEditProfile() {
-    // TODO: إظهار صفحة تعديل الملف الشخصي
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('سيتم إضافة تعديل الملف الشخصي قريباً')),
-    );
+  void _showEditProfile() async {
+    try {
+      // استخدام دالة التوجيه المحدثة مع النوع الصحيح
+      final result = await AppRoutes.pushEditProfile(context);
+
+      // إذا تم حفظ التغييرات، قم بتحديث الواجهة
+      if (result == true) {
+        setState(() {
+          // إعادة بناء الواجهة لتحديث البيانات
+        });
+      }
+    } catch (e) {
+      SafetyMonitor.logError('Navigation Error in _showEditProfile', e);
+    }
   }
 
   void _showSettings() {
-    // TODO: إظهار صفحة الإعدادات
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('سيتم إضافة الإعدادات قريباً')),
-    );
+    AppRoutes.pushSettings(context);
   }
 
   void _shareProfile() {
-    // TODO: مشاركة الملف الشخصي
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('سيتم إضافة المشاركة قريباً')),
-    );
+    AppRoutes.pushShareProfile(context);
   }
 
   void _showAchievementDetails(Map<String, dynamic> achievement) {

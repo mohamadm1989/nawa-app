@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/constants.dart';
-import '../../core/animations/nawa_animations.dart';
 
 /// زر مخصص لتطبيق نِواة
 /// يطبق نظام التصميم المحدد
@@ -84,8 +83,11 @@ class NawaButton extends StatelessWidget {
   }
 
   Widget _buildElevatedButton(BuildContext context) {
-    return InteractiveAnimation(
-      onTap: isLoading ? null : onPressed,
+    return InteractionFeedback.createTapEffect(
+      onTap: isLoading ? null : () {
+        InteractionFeedback.haptic(InteractionType.tap);
+        onPressed?.call();
+      },
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
@@ -104,8 +106,11 @@ class NawaButton extends StatelessWidget {
   }
 
   Widget _buildOutlinedButton(BuildContext context) {
-    return InteractiveAnimation(
-      onTap: isLoading ? null : onPressed,
+    return InteractionFeedback.createTapEffect(
+      onTap: isLoading ? null : () {
+        InteractionFeedback.haptic(InteractionType.tap);
+        onPressed?.call();
+      },
       child: OutlinedButton(
         onPressed: isLoading ? null : onPressed,
         style: OutlinedButton.styleFrom(
@@ -137,12 +142,11 @@ class NawaButton extends StatelessWidget {
 
   Widget _buildButtonContent(BuildContext context) {
     if (isLoading) {
-      return LoadingAnimation(
+      return LoadingIndicators.button(
         size: 20,
         color: type == NawaButtonType.primary
             ? AppColors.textOnColor
             : AppColors.primaryGreen,
-        type: LoadingType.dots,
       );
     }
 

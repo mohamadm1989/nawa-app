@@ -3,3 +3,5 @@
 
 export 'nawa_button.dart';
 export 'project_card.dart';
+export 'responsive_text_widget.dart';
+export 'accessible_widgets.dart';

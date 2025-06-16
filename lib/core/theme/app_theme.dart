@@ -31,16 +31,28 @@ class AppTheme {
       
       // ========== الخطوط ==========
       fontFamily: 'Cairo',
+      fontFamilyFallback: const ['Cairo'], // فرض استخدام Cairo فقط
       textTheme: TextTheme(
-        headlineLarge: AppTextStyles.headlineLarge,
-        headlineMedium: AppTextStyles.headlineMedium,
-        headlineSmall: AppTextStyles.headlineSmall,
-        bodyLarge: AppTextStyles.bodyLarge,
-        bodyMedium: AppTextStyles.bodyMedium,
-        bodySmall: AppTextStyles.bodySmall,
-        labelLarge: AppTextStyles.labelLarge,
-        labelMedium: AppTextStyles.labelMedium,
-        labelSmall: AppTextStyles.labelSmall,
+        headlineLarge: AppTextStyles.headlineLarge.copyWith(fontFamily: 'Cairo'),
+        headlineMedium: AppTextStyles.headlineMedium.copyWith(fontFamily: 'Cairo'),
+        headlineSmall: AppTextStyles.headlineSmall.copyWith(fontFamily: 'Cairo'),
+        bodyLarge: AppTextStyles.bodyLarge.copyWith(fontFamily: 'Cairo'),
+        bodyMedium: AppTextStyles.bodyMedium.copyWith(fontFamily: 'Cairo'),
+        bodySmall: AppTextStyles.bodySmall.copyWith(fontFamily: 'Cairo'),
+        labelLarge: AppTextStyles.labelLarge.copyWith(fontFamily: 'Cairo'),
+        labelMedium: AppTextStyles.labelMedium.copyWith(fontFamily: 'Cairo'),
+        labelSmall: AppTextStyles.labelSmall.copyWith(fontFamily: 'Cairo'),
+      ),
+      primaryTextTheme: TextTheme(
+        headlineLarge: AppTextStyles.headlineLarge.copyWith(fontFamily: 'Cairo'),
+        headlineMedium: AppTextStyles.headlineMedium.copyWith(fontFamily: 'Cairo'),
+        headlineSmall: AppTextStyles.headlineSmall.copyWith(fontFamily: 'Cairo'),
+        bodyLarge: AppTextStyles.bodyLarge.copyWith(fontFamily: 'Cairo'),
+        bodyMedium: AppTextStyles.bodyMedium.copyWith(fontFamily: 'Cairo'),
+        bodySmall: AppTextStyles.bodySmall.copyWith(fontFamily: 'Cairo'),
+        labelLarge: AppTextStyles.labelLarge.copyWith(fontFamily: 'Cairo'),
+        labelMedium: AppTextStyles.labelMedium.copyWith(fontFamily: 'Cairo'),
+        labelSmall: AppTextStyles.labelSmall.copyWith(fontFamily: 'Cairo'),
       ),
       
       // ========== شريط التطبيق ==========
@@ -51,6 +63,7 @@ class AppTheme {
         centerTitle: true,
         titleTextStyle: AppTextStyles.headlineSmall.copyWith(
           color: AppColors.textOnColor,
+          fontFamily: 'Cairo',
         ),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
@@ -69,7 +82,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
           ),
           minimumSize: const Size(double.infinity, AppConstants.buttonHeight),
-          textStyle: AppTextStyles.buttonPrimary,
+          textStyle: AppTextStyles.buttonPrimary.copyWith(fontFamily: 'Cairo'),
         ),
       ),
       
@@ -84,14 +97,14 @@ class AppTheme {
             borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
           ),
           minimumSize: const Size(double.infinity, AppConstants.buttonHeight),
-          textStyle: AppTextStyles.buttonSecondary,
+          textStyle: AppTextStyles.buttonSecondary.copyWith(fontFamily: 'Cairo'),
         ),
       ),
       
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primaryGreen,
-          textStyle: AppTextStyles.labelLarge,
+          textStyle: AppTextStyles.labelLarge.copyWith(fontFamily: 'Cairo'),
         ),
       ),
       
@@ -122,9 +135,9 @@ class AppTheme {
           horizontal: AppConstants.spacingMedium,
           vertical: AppConstants.spacingMedium,
         ),
-        hintStyle: AppTextStyles.hint,
-        labelStyle: AppTextStyles.labelMedium,
-        errorStyle: AppTextStyles.error,
+        hintStyle: AppTextStyles.hint.copyWith(fontFamily: 'Cairo'),
+        labelStyle: AppTextStyles.labelMedium.copyWith(fontFamily: 'Cairo'),
+        errorStyle: AppTextStyles.error.copyWith(fontFamily: 'Cairo'),
       ),
       
       // ========== الكروت ==========
@@ -168,8 +181,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusLarge),
         ),
-        titleTextStyle: AppTextStyles.headlineSmall,
-        contentTextStyle: AppTextStyles.bodyMedium,
+        titleTextStyle: AppTextStyles.headlineSmall.copyWith(fontFamily: 'Cairo'),
+        contentTextStyle: AppTextStyles.bodyMedium.copyWith(fontFamily: 'Cairo'),
       ),
       
       // ========== القوائم المنسدلة ==========
@@ -180,7 +193,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
         ),
-        textStyle: AppTextStyles.bodyMedium,
+        textStyle: AppTextStyles.bodyMedium.copyWith(fontFamily: 'Cairo'),
       ),
       
       // ========== أشرطة التمرير ==========
@@ -194,7 +207,7 @@ class AppTheme {
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.secondaryBeige,
         selectedColor: AppColors.primaryGreen,
-        labelStyle: AppTextStyles.labelMedium,
+        labelStyle: AppTextStyles.labelMedium.copyWith(fontFamily: 'Cairo'),
         padding: const EdgeInsets.symmetric(
           horizontal: AppConstants.spacingMedium,
           vertical: AppConstants.spacingSmall,

@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart'; // لإخفاء رسائل overflow
 import 'package:flutter/services.dart';
+import 'package:flutter/foundation.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/constants.dart';
 import 'core/routes/app_routes.dart';
@@ -15,6 +16,20 @@ import 'core/services/notification_service.dart';
 void main() async {
   // إعداد معالج الأخطاء الآمن
   _setupSafeErrorHandling();
+
+  // إخفاء رسائل تحذير الخطوط في وضع التطوير
+  if (kDebugMode) {
+    final originalDebugPrint = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {
+      if (message != null &&
+          (message.contains('Could not find a set of Noto fonts') ||
+           message.contains('missing characters') ||
+           message.contains('Noto fonts'))) {
+        return; // تجاهل رسائل تحذير الخطوط
+      }
+      originalDebugPrint(message, wrapWidth: wrapWidth);
+    };
+  }
 
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -37,6 +52,13 @@ void _setupSafeErrorHandling() {
     // إخفاء رسائل overflow تمامًا
     if (details.exception.toString().contains('RenderFlex overflowed') ||
         details.exception.toString().contains('overflow')) {
+      return;
+    }
+
+    // إخفاء رسائل تحذير الخطوط المفقودة
+    if (details.exception.toString().contains('Could not find a set of Noto fonts') ||
+        details.exception.toString().contains('missing characters') ||
+        details.exception.toString().contains('Noto fonts')) {
       return;
     }
 
@@ -160,7 +182,15 @@ class NawaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // ========== الثيم ==========
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.lightTheme.copyWith(
+        // فرض استخدام خط Cairo فقط
+        textTheme: AppTheme.lightTheme.textTheme.apply(
+          fontFamily: 'Cairo',
+        ),
+        primaryTextTheme: AppTheme.lightTheme.primaryTextTheme.apply(
+          fontFamily: 'Cairo',
+        ),
+      ),
 
       // ========== اللغة والتوطين ==========
       locale: const Locale('en', 'US'), // الإنجليزية مؤقت<|im_start|>ح

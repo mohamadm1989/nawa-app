@@ -186,22 +186,25 @@ class UserDataManager {
   /// تحديث الملف الشخصي بأمان
   static Map<String, dynamic> updateProfile(Map<String, dynamic> updates) {
     try {
-      final currentData = getSafeUserData();
-      
+      final currentData = _getOriginalUserData(); // استخدام البيانات الأصلية للتحديث
+
       // قائمة الحقول المسموح تحديثها
-      final allowedFields = ['name', 'avatar'];
-      
+      final allowedFields = ['name', 'avatar', 'bio', 'phone', 'email', 'location'];
+
       for (final field in allowedFields) {
         if (updates.containsKey(field)) {
           currentData[field] = updates[field];
         }
       }
-      
+
       // تحديث وقت آخر تعديل
       currentData['lastUpdated'] = DateTime.now().toIso8601String();
-      
+
+      // تطبيق طبقة الحماية على البيانات المحدثة
+      final safeData = _sanitizeUserData(currentData);
+
       SafetyMonitor.logSuccess('Profile Update');
-      return currentData;
+      return safeData;
     } catch (e) {
       SafetyMonitor.logError('Profile Update', e);
       return getSafeUserData(); // إرجاع البيانات الحالية
@@ -249,23 +252,99 @@ class UserDataManager {
   /// الحصول على إحصائيات المستخدم
   static Map<String, dynamic> getUserStats() {
     try {
+      final userData = getSafeUserData();
+      final joinDate = userData['joinDate'] ?? DateTime.now().toIso8601String();
+
       // إحصائيات تجريبية - ستأتي من قاعدة البيانات لاحقاً
       return {
-        'projects_created': 3,
-        'total_donations': 250.0,
-        'projects_supported': 12,
-        'impact_score': 85,
-        'join_date': getSafeUserData()['joinDate'],
-        'last_activity': DateTime.now().toIso8601String(),
+        'totalDonations': 15,
+        'totalAmount': 750000,
+        'projectsSupported': 8,
+        'peopleHelped': 127,
+        'impactScore': 85,
+        'joinDate': joinDate,
+        'lastActivity': DateTime.now().toIso8601String(),
+        // إضافة قيم افتراضية آمنة
+        'projectsCreated': 3,
+        'donationsThisMonth': 5,
+        'averageDonation': 50000,
+        'successRate': 100,
       };
     } catch (e) {
       SafetyMonitor.logError('User Stats', e);
+      // إرجاع قيم افتراضية آمنة
       return {
-        'projects_created': 0,
-        'total_donations': 0.0,
-        'projects_supported': 0,
-        'impact_score': 0,
+        'totalDonations': 0,
+        'totalAmount': 0,
+        'projectsSupported': 0,
+        'peopleHelped': 0,
+        'impactScore': 0,
+        'joinDate': DateTime.now().toIso8601String(),
+        'lastActivity': DateTime.now().toIso8601String(),
+        'projectsCreated': 0,
+        'donationsThisMonth': 0,
+        'averageDonation': 0,
+        'successRate': 0,
       };
+    }
+  }
+
+  /// الحصول على بيانات آمنة مع فحص null
+  static String getSafeString(Map<String, dynamic> data, String key, [String defaultValue = '']) {
+    try {
+      final value = data[key];
+      if (value == null) return defaultValue;
+      return value.toString();
+    } catch (e) {
+      SafetyMonitor.logError('Safe String Get', e);
+      return defaultValue;
+    }
+  }
+
+  /// الحصول على رقم آمن مع فحص null
+  static int getSafeInt(Map<String, dynamic> data, String key, [int defaultValue = 0]) {
+    try {
+      final value = data[key];
+      if (value == null) return defaultValue;
+      if (value is int) return value;
+      if (value is double) return value.toInt();
+      if (value is String) return int.tryParse(value) ?? defaultValue;
+      return defaultValue;
+    } catch (e) {
+      SafetyMonitor.logError('Safe Int Get', e);
+      return defaultValue;
+    }
+  }
+
+  /// الحصول على رقم عشري آمن مع فحص null
+  static double getSafeDouble(Map<String, dynamic> data, String key, [double defaultValue = 0.0]) {
+    try {
+      final value = data[key];
+      if (value == null) return defaultValue;
+      if (value is double) return value;
+      if (value is int) return value.toDouble();
+      if (value is String) return double.tryParse(value) ?? defaultValue;
+      return defaultValue;
+    } catch (e) {
+      SafetyMonitor.logError('Safe Double Get', e);
+      return defaultValue;
+    }
+  }
+
+  /// الحصول على قيمة منطقية آمنة مع فحص null
+  static bool getSafeBool(Map<String, dynamic> data, String key, [bool defaultValue = false]) {
+    try {
+      final value = data[key];
+      if (value == null) return defaultValue;
+      if (value is bool) return value;
+      if (value is String) {
+        return value.toLowerCase() == 'true' || value == '1';
+      }
+      if (value is int) return value != 0;
+      return defaultValue;
+    } catch (e) {
+      SafetyMonitor.logError('Safe Bool Get', e);
+      return defaultValue;
     }
   }
 }

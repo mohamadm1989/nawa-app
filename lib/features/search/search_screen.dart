@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/constants.dart';
+import '../../core/utils/responsive_helper.dart';
 import '../../shared/models/project_model.dart';
 import '../../core/routes/app_routes.dart';
 import '../../core/animations/nawa_animations.dart';
 import '../../core/services/projects_service.dart';
+import '../../shared/widgets/widgets.dart';
 
 /// صفحة البحث الشاملة
 /// تحتوي على تبويبات متعددة وفلاتر متقدمة
@@ -143,13 +145,13 @@ class _SearchScreenState extends State<SearchScreen>
 
   Widget _buildSearchHeader() {
     return Container(
-      padding: const EdgeInsets.all(AppConstants.spacingMedium),
+      padding: ResponsiveConstants.getMediumPadding(context),
       decoration: BoxDecoration(
         color: AppColors.backgroundCard,
         boxShadow: [
           BoxShadow(
             color: AppColors.shadowLight,
-            blurRadius: 8,
+            blurRadius: ResponsiveHelper.needsCompactLayout(context) ? 4.0 : 8.0,
             offset: const Offset(0, 2),
           ),
         ],
@@ -171,13 +173,17 @@ class _SearchScreenState extends State<SearchScreen>
               // حقل البحث
               Expanded(
                 child: Container(
-                  height: 48,
+                  height: ResponsiveConstants.getInputHeight(context),
                   decoration: BoxDecoration(
                     color: AppColors.backgroundPrimary,
-                    borderRadius: BorderRadius.circular(AppConstants.borderRadiusMedium),
+                    borderRadius: BorderRadius.circular(
+                      ResponsiveHelper.needsCompactLayout(context)
+                          ? AppConstants.borderRadiusSmall
+                          : AppConstants.borderRadiusMedium,
+                    ),
                     border: Border.all(
-                      color: _isSearching 
-                          ? AppColors.primaryGreen 
+                      color: _isSearching
+                          ? AppColors.primaryGreen
                           : AppColors.helperGray.withValues(alpha: 0.3),
                     ),
                   ),
@@ -188,13 +194,16 @@ class _SearchScreenState extends State<SearchScreen>
                     textDirection: TextDirection.rtl,
                     textAlign: TextAlign.right,
                     decoration: InputDecoration(
-                      hintText: 'ابحث في جميع المحتويات...',
-                      hintStyle: AppTextStyles.bodyMedium.copyWith(
+                      hintText: ResponsiveHelper.needsCompactLayout(context)
+                          ? 'ابحث...'
+                          : 'ابحث في جميع المحتويات...',
+                      hintStyle: ResponsiveConstants.getBodyStyle(context).copyWith(
                         color: AppColors.textHint,
                       ),
                       prefixIcon: Icon(
                         Icons.search,
                         color: AppColors.primaryGreen,
+                        size: ResponsiveConstants.getMediumIconSize(context),
                       ),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(

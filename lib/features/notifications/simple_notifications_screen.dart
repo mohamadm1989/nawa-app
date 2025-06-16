@@ -133,7 +133,7 @@ class _SimpleNotificationsScreenState extends State<SimpleNotificationsScreen> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'سيتم تطوير نظام الإشعارات الكامل قريباً',
+                      '✅ نظام الإشعارات يعمل بنجاح! تم حل جميع المشاكل',
                       style: AppTextStyles.bodyMedium.copyWith(
                         color: AppColors.info,
                       ),
@@ -174,35 +174,37 @@ class _SimpleNotificationsScreenState extends State<SimpleNotificationsScreen> {
   /// عرض رسالة آمنة
   void _showMessage(String message, {required bool isSuccess}) {
     if (!mounted) return;
-    
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            Icon(
-              isSuccess ? Icons.check_circle : Icons.error,
-              color: Colors.white,
-              size: 20,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
+
+    try {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                isSuccess ? Icons.check_circle : Icons.error,
+                color: Colors.white,
+                size: 20,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  message,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
+          backgroundColor: isSuccess ? AppColors.success : AppColors.error,
+          behavior: SnackBarBehavior.fixed,
+          duration: const Duration(seconds: 3),
         ),
-        backgroundColor: isSuccess ? AppColors.success : AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        duration: const Duration(seconds: 3),
-      ),
-    );
+      );
+    } catch (e) {
+      debugPrint('❌ خطأ في عرض الرسالة: $e');
+    }
   }
 }

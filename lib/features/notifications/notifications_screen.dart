@@ -584,8 +584,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   Widget _buildNotificationCard(Map<String, dynamic> notification) {
-    final isRead = notification['isRead'] as bool;
-    final timestamp = notification['timestamp'] as DateTime;
+    final isRead = UserDataManager.getSafeBool(notification, 'isRead', false);
+    final timestamp = notification['timestamp'] as DateTime? ?? DateTime.now();
     final timeAgo = _getTimeAgo(timestamp);
 
     return Container(
@@ -623,12 +623,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: notification['color'].withValues(alpha: 0.1),
+                    color: (notification['color'] as Color? ?? AppColors.primaryGreen).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    notification['icon'],
-                    color: notification['color'],
+                    notification['icon'] as IconData? ?? Icons.notifications,
+                    color: notification['color'] as Color? ?? AppColors.primaryGreen,
                     size: 24,
                   ),
                 ),
@@ -646,7 +646,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         children: [
                           Expanded(
                             child: Text(
-                              notification['title'],
+                              UserDataManager.getSafeString(notification, 'title', 'إشعار'),
                               style: AppTextStyles.bodyLarge.copyWith(
                                 fontWeight: isRead ? FontWeight.w500 : FontWeight.w700,
                                 color: isRead ? AppColors.textPrimary : AppColors.primaryGreen,
@@ -663,19 +663,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                         ],
                       ),
 
-                      const SizedBox(height: 6),
+                      const SizedBox(height: 4),
 
                       // الرسالة
                       Text(
-                        notification['message'],
+                        UserDataManager.getSafeString(notification, 'message', 'لا توجد رسالة'),
                         style: AppTextStyles.bodyMedium.copyWith(
                           color: AppColors.textSecondary,
                         ),
-                        maxLines: 3,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
 
                       // أزرار العمل
                       _buildNotificationActions(notification),
@@ -702,64 +702,80 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   Widget _buildNotificationActions(Map<String, dynamic> notification) {
-    final actionType = notification['actionType'] as String;
+    final actionType = UserDataManager.getSafeString(notification, 'actionType', 'view');
 
-    return Row(
-      children: [
-        // زر العمل الأساسي
-        TextButton.icon(
-          onPressed: () => _handleNotificationAction(notification),
-          icon: Icon(
-            _getActionIcon(actionType),
-            size: 16,
-            color: AppColors.primaryGreen,
-          ),
-          label: Text(
-            _getActionText(actionType),
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.primaryGreen,
-              fontWeight: FontWeight.w600,
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // زر العمل الأساسي
+          Flexible(
+            child: TextButton.icon(
+              onPressed: () => _handleNotificationAction(notification),
+              icon: Icon(
+                _getActionIcon(actionType),
+                size: 16,
+                color: AppColors.primaryGreen,
+              ),
+              label: Text(
+                _getActionText(actionType),
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.primaryGreen,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                minimumSize: Size.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
             ),
           ),
-          style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
 
-        const SizedBox(width: 8),
+          const SizedBox(width: 4),
 
-        // زر تحديد كمقروء/غير مقروء
-        IconButton(
-          onPressed: () => _toggleReadStatus(notification),
-          icon: Icon(
-            notification['isRead'] ? Icons.mark_email_unread : Icons.mark_email_read,
-            size: 18,
-            color: AppColors.helperGray,
+          // زر تحديد كمقروء/غير مقروء
+          IconButton(
+            onPressed: () => _toggleReadStatus(notification),
+            icon: Icon(
+              UserDataManager.getSafeBool(notification, 'isRead', false) ? Icons.mark_email_unread : Icons.mark_email_read,
+              size: 16,
+              color: AppColors.helperGray,
+            ),
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            constraints: const BoxConstraints(
+              minWidth: 32,
+              minHeight: 32,
+            ),
           ),
-          style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(4),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
 
-        // زر الحذف
-        IconButton(
-          onPressed: () => _deleteNotification(notification),
-          icon: const Icon(
-            Icons.delete_outline,
-            size: 18,
-            color: AppColors.error,
+          // زر الحذف
+          IconButton(
+            onPressed: () => _deleteNotification(notification),
+            icon: const Icon(
+              Icons.delete_outline,
+              size: 16,
+              color: AppColors.error,
+            ),
+            style: IconButton.styleFrom(
+              padding: const EdgeInsets.all(4),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            constraints: const BoxConstraints(
+              minWidth: 32,
+              minHeight: 32,
+            ),
           ),
-          style: IconButton.styleFrom(
-            padding: const EdgeInsets.all(4),
-            minimumSize: Size.zero,
-            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -816,7 +832,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   void _handleNotificationTap(Map<String, dynamic> notification) {
     // تحديد الإشعار كمقروء عند النقر
-    if (!notification['isRead']) {
+    if (!UserDataManager.getSafeBool(notification, 'isRead', false)) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           setState(() {
@@ -831,8 +847,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   void _handleNotificationAction(Map<String, dynamic> notification) {
-    final actionType = notification['actionType'] as String;
-    final actionData = notification['actionData'] as Map<String, dynamic>;
+    final actionType = UserDataManager.getSafeString(notification, 'actionType', 'view');
+    final actionData = notification['actionData'] as Map<String, dynamic>? ?? <String, dynamic>{};
 
     switch (actionType) {
       case 'view_project':
@@ -861,9 +877,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   // ========== دوال التنقل ==========
 
   void _navigateToProject(Map<String, dynamic> actionData) {
-    final projectId = actionData['projectId'] as String?;
+    final projectId = UserDataManager.getSafeString(actionData, 'projectId', '');
 
-    if (projectId != null && projectId.isNotEmpty) {
+    if (projectId.isNotEmpty) {
       // إنشاء مشروع تجريبي للعرض
       final sampleProject = _createSampleProject(projectId);
 
@@ -885,9 +901,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 
   void _navigateToImpact(Map<String, dynamic> actionData) {
-    final projectId = actionData['projectId'] as String?;
+    final projectId = UserDataManager.getSafeString(actionData, 'projectId', '');
 
-    if (projectId != null && projectId.isNotEmpty) {
+    if (projectId.isNotEmpty) {
       // إنشاء مشروع تجريبي للعرض
       final sampleProject = _createSampleProject(projectId);
 
@@ -924,13 +940,15 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
-          notification['isRead'] = !notification['isRead'];
+          final currentStatus = UserDataManager.getSafeBool(notification, 'isRead', false);
+          notification['isRead'] = !currentStatus;
         });
 
+        final newStatus = UserDataManager.getSafeBool(notification, 'isRead', false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              notification['isRead'] ? 'تم تحديد الإشعار كمقروء' : 'تم تحديد الإشعار كغير مقروء',
+              newStatus ? 'تم تحديد الإشعار كمقروء' : 'تم تحديد الإشعار كغير مقروء',
             ),
           ),
         );
@@ -942,7 +960,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         setState(() {
-          _allNotifications.removeWhere((n) => n['id'] == notification['id']);
+          final notificationId = UserDataManager.getSafeString(notification, 'id', '');
+          _allNotifications.removeWhere((n) => UserDataManager.getSafeString(n, 'id', '') == notificationId);
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
